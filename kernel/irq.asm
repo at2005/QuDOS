@@ -134,6 +134,15 @@ irq15:
 
 lidt_asm:
 	mov edx, [esp+4]
-	lidt [edx]
-	;sti
+	idt_desc:
+		dw 2048
+		address:
+			dd 0x0
+	mov [address], edx
+		
+		
+		
+	
+	lidt [idt_desc]
+	sti
 	ret
