@@ -11,6 +11,9 @@
 #define CURSOR_DATA_REG 0x3D5
 
 
+static unsigned char* print_offset = (unsigned char*)(0xB8000);
+
+
 // get location offset based on rows and columns
 unsigned char* get_location(unsigned int row, unsigned int column) {
 	// bit shifts correspond to (row * 80) = (row * 64) + (row * 16)
@@ -22,13 +25,14 @@ unsigned char* get_location(unsigned int row, unsigned int column) {
 	
 }
 
-
 // function to print character
 void print_char(unsigned char ch, unsigned int color) {
 	// set video memory to character
-	*(unsigned char*)VIDEO_MEMORY = ch;
+	*(unsigned char*)print_offset = ch;
 	// set video memory + 1 to color
-	*(unsigned char*)(VIDEO_MEMORY+1) = color;
+	*(unsigned char*)(print_offset+1) = color;
+	print_offset += 2;
+	
 }
 
 
@@ -39,14 +43,18 @@ void print_char_at_loc(unsigned char ch, unsigned int color, unsigned char* posi
 	*position = ch;
 	// write color to next byte
 	*(position+1) = color; 
+
+
 }
 
 
 
 // print string at location
 void print_string_at_loc(char* string, int color, unsigned char* loc) {
+	void set_newline();
+	void set_cursor(unsigned short offset);
 	// declare video memory
-	unsigned char* vidmem = (unsigned char*)VIDEO_MEMORY;
+	unsigned char* vidmem = print_offset;
 	
 	// set video memory offset
 	if(loc != 0) vidmem = loc; 
@@ -58,7 +66,15 @@ void print_string_at_loc(char* string, int color, unsigned char* loc) {
 		print_char_at_loc(string[i], color, vidmem);
 		// increment location
 		vidmem+=2;
+		print_offset += 2;
+
 	}
+	
+	int offset = (int)(vidmem - VIDEO_MEMORY);
+	offset >>= 1;
+	set_cursor(offset);
+	set_newline();
+	
 }
 
 
@@ -66,106 +82,118 @@ void print_string_at_loc(char* string, int color, unsigned char* loc) {
 // print string at default location
 void print(char* string, int color) {
 	void set_cursor(unsigned short offset);
-	// declare video memory
-	unsigned char* vidmem = (unsigned char*)VIDEO_MEMORY;
 	// iterate over string
 	for(int i = 0; string[i] != '\0'; i++) {
 		// print char at location
-		print_char_at_loc(string[i], color, vidmem);
+		print_char_at_loc(string[i], color, print_offset);
 		// increment video memory by two
-		vidmem+=2;
+		print_offset += 2;
+
 	}
 	
-	int offset = (int)(vidmem - 0xB8000);
+	int offset = (int)(print_offset - 0xB8000);
 	offset >>= 1;
 	set_cursor(offset);
 	
 }
 
-void print_hex(uint32_t hex, int size) {
-	
-	for(int i = 0; i < 8; i++) {
-		char temp = hex & 0x0000000F;
 
+
+
+char get_digit(char digit) {
+
+	if(digit == 0x0) {
+		return '0';
 	}
-	
-	
-}
-
-
-void print_digit(char digit, char color) {
 
 	if(digit == 0x1) {
-		print_char('1', color);
+		return '1';
 	}
 	
 	else if(digit == 0x2) {
-		print_char('2', color);
+		return '2';
 	}
 	
 	else if(digit == 0x3) {
-		print_char('3', color);
+		return '3';
 	}
 	
 	else if(digit == 0x4) {
-		print_char('4', color);
+		return '4';
 	}
 	
 	else if(digit == 0x5) {
-		print_char('5', color);
+		return '5';
 	}
 	
 	else if(digit == 0x6) {
-		print_char('6', color);
+		return '6';
 	}
 	
 	else if(digit == 0x7) {
-		print_char('7', color);
+		return '7';
 	}
 	
 	else if(digit == 0x8) {
-		print_char('8', color);
+		return '8';
 	}
 	
 	else if(digit == 0x9) {
-		print_char('9', color);
+		return '9';
 	}
 	
 	else if(digit == 0xA) {
-		print_char('A', color);
+		return 'A';
 	}
 	
 	else if(digit == 0xB) {
-		print_char('B', color);
+		return 'B';
 	}
 	
 	else if(digit == 0xC) {
-		print_char('C', color);
+		return 'C';
 	}
 	
 	else if(digit == 0xD) {
-		print_char('D', color);
+		return 'D';
 	}
 	
 	else if(digit == 0xE) {
-		print_char('E', color);
+		return 'E';
 	}
 	
 	else if(digit == 0xF) {
-		print_char('F', color);
+		return 'F';
 	}
+	
+	return 0x00;
+
+}
 
 
+void print_hex(uint32_t hex) {
+	unsigned char* vidmem = (unsigned char*)print_offset;
+	print_string_at_loc("0x",GREEN_ON_BLACK, vidmem);
+	vidmem += 4;
+	char buffer[9];
+	for(int i = 0; i < 8; i++) {
+		volatile char temp = (hex & 0x0000000F);
+		buffer[7-i] = get_digit(temp);
+		hex >>= 4;
+	}
+	
+	
+	print_string_at_loc(buffer, GREEN_ON_BLACK, vidmem);
 }
 
 
 
 // get cursor offset
-unsigned int get_cursor() {
+unsigned short get_cursor() {
 	// select register 14
 	outb(14, CURSOR_CONTROL_REG);
 	// write to register and shift by a byte because this is the high byte
-	int offset = inb(CURSOR_DATA_REG) << 8;
+	unsigned short offset = inb(CURSOR_DATA_REG) << 8;
 	// select register 15
 	outb(15, CURSOR_CONTROL_REG);
 	// read low byte
@@ -179,17 +207,25 @@ unsigned int get_cursor() {
 void set_cursor(unsigned short offset) {
 	// select register 14
 	outb(14,CURSOR_CONTROL_REG);
-	// store low byte from offset
-	unsigned char low_byte = offset << 8;
+	// store high byte from offset
+	unsigned char high_byte = (offset & 0xFF00) >> 8;
 	// write low byte to register
-	outb(low_byte,CURSOR_DATA_REG);
+	outb(high_byte,CURSOR_DATA_REG);
 	// select register 15
 	outb(15, CURSOR_CONTROL_REG);
-	// store high byte from offset in register
-	outb(offset,CURSOR_DATA_REG);
+	// store low byte from offset in register
+	outb((offset & 0x00FF),CURSOR_DATA_REG);
 	// set colour	
 	*(unsigned char*)(VIDEO_MEMORY+offset*2 + 1) = GREEN_ON_BLACK;
-	
+}
+
+
+void advance_cursor() {
+	set_cursor((get_cursor()/2) + 1);
+}
+
+void decrement_cursor() {
+	set_cursor(get_cursor()/2 - 1);
 }
 
 
@@ -204,6 +240,22 @@ void clear_screen() {
 	}
 	
 }
+
+
+void set_newline() {
+	int offset = (int)(print_offset - VIDEO_MEMORY);
+	offset >>= 1;
+	offset /= 80;
+	
+	print_offset = get_location(offset+1, 0);
+	
+	int char_offset = (int)(print_offset - VIDEO_MEMORY);
+	char_offset/=2;
+	set_cursor(char_offset);
+	
+}
+
+
 
 #endif
 
