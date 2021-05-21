@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include "print.h"
+#include "keyboard.h"
+
 #define PICM_CONTROL 0x20
 #define PICS_CONTROL 0xA0
 #define PICM_DATA 0x21
@@ -28,13 +30,8 @@ struct idt_entry {
 struct idt_entry IDT[256];
 
 
-// idt descriptor structure
-struct idt_desc {
-	// size of IDT
-	uint16_t size;
-	// address of IDT
-	struct idt_entry* address;
-} IDT_DESCRIPTOR = {2047, IDT};
+
+
 
 
 // initialize interrupt descriptor table
@@ -75,7 +72,7 @@ void initialize_idt() {
 	uint32_t irq13_address = (uint32_t)irq13;
 	uint32_t irq14_address = (uint32_t)irq14;
 	uint32_t irq15_address = (uint32_t)irq15;
-
+	
 	uint32_t arr_of_addresses[16] = {irq0_address, irq1_address, irq2_address, irq3_address, irq4_address, irq5_address,irq6_address, irq7_address, irq8_address, irq9_address, irq10_address, irq11_address, irq12_address, irq13_address, irq14_address, irq15_address};
 	// give both PIC controllers initialze commands
 	// command to write
@@ -92,7 +89,7 @@ void initialize_idt() {
 	// command to enable cascading
 	// telling master that IRQ2 is connected to slave
 	outb(0x04, PICM_DATA);
-	// tell slave it is to be connected to IRQ2
+	// tell slave it is to be connected to IRQ2 of master
 	outb(0x02,PICS_DATA);
 	
 	// additional information
@@ -102,7 +99,6 @@ void initialize_idt() {
 	
 	// initialize each interrupt entry in IDT
 	// start from index 32 of IDT since these are non-CPU interrupts (Interrupt requests)
-
 	for(volatile int i = 0; i < 16; i++) {
 		// irq0
 		// set offsets
@@ -117,11 +113,13 @@ void initialize_idt() {
 		// set type attributes
 		IDT[32+i].type = 0b10001110;
 		
+		
 	}
 	
 	
+
 	extern int lidt_asm();
-	lidt_asm(IDT_DESCRIPTOR);
+	lidt_asm(IDT);
 	
 
 }
@@ -129,18 +127,23 @@ void initialize_idt() {
 
 
 void irq0_handler() {
+
 	outb(0x20,0x20);
 }
 
 
 void irq1_handler() {
-	print("Hello", 0x0F);
+	keyboard_handle();
 	outb(0x20,0x20);
+	return;
 }
+
+
 void irq2_handler() {
 	outb(0x20,0x20);
 
 }
+
 
 void irq3_handler() {
 	outb(0x20,0x20);
