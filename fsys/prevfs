@@ -1,0 +1,65 @@
+#ifndef FMANAGE_H
+#define FMANAGE_H
+
+#include "inode.h"
+
+#define MASK64 0x8000000000000000
+
+typedef struct bitmap {
+	uint64_t sec0;
+	uint64_t sec1;
+	uint64_t sec2;
+	uint64_t sec3;
+
+} bitmap;
+
+static bitmap inode_bitmap;
+
+
+void flip_bit(uint64_t* sec, uint8_t bit_pos) {
+	uint64_t offset = (MASK64 >> (bit_pos % 64));
+	*sec ^= offset;
+	
+	
+	
+}
+
+bool check_bit(uint64_t sec, uint8_t bit_pos) {
+	uint64_t bit = (MASK64 >> (bit_pos % 64));
+	if(sec & bit) {
+		return TRUE;
+	}
+	
+	return FALSE; 
+}
+
+
+uint8_t allocate_inode() {
+	for(int i = 0; i < 64; i++) {
+		if(!check_bit(inode_bitmap.sec0, i)) {
+			flip_bit(&inode_bitmap.sec0, i);
+			return i;
+		}
+		
+		if(!check_bit(inode_bitmap.sec1, i)) {
+			flip_bit(&inode_bitmap.sec1, i);
+			return i+64;
+		}
+		
+		if(!check_bit(inode_bitmap.sec2, i)) {
+			flip_bit(&inode_bitmap.sec2, i);
+			return i+128;
+		}
+		
+			
+		if(!check_bit(inode_bitmap.sec3, i)) {
+			flip_bit(&inode_bitmap.sec3, i);
+			return i+192;
+		}
+		
+		
+	}		
+
+}
+
+#endif
