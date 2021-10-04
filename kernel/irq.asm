@@ -75,6 +75,7 @@ global irq12
 global irq13
 global irq14
 global irq15
+global irq64
 global irq128
 
 
@@ -95,6 +96,7 @@ global irq128
 [extern irq14_handler]
 [extern irq15_handler]
 [extern syscall_handler]
+[extern qcall_handler]
 [extern print_hex]
 
 
@@ -471,9 +473,22 @@ irq128:
 	push ebx
 	push eax
 	call syscall_handler
-	;jmp $
 	add esp, 16
+	;popa
 	iret
+
+
+irq64:
+	pushad
+	push edx
+	push ecx
+	push ebx
+	push eax
+	call qcall_handler
+	add esp,16
+	popad
+	iret	
+
 	
 
 lidt_asm:

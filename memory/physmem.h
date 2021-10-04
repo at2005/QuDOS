@@ -167,7 +167,7 @@ uint32_t map_page(uint32_t addr) {
 	uint32_t* page_table = (uint32_t*)(page_dir[pd_offset] & 0xFFFFF000);
 	// map address to new physical page frame
 	
-	uint32_t page_frame = get_page();
+	uint32_t page_frame = (uint32_t)get_page();
 	page_table[pt_offset] = (uint32_t)page_frame | 7;
 	
 	return page_frame;

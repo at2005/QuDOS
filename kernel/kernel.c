@@ -9,6 +9,8 @@
 #include "../fsys/fmanage.h"
 #include "../processes/readelf.h"
 #include "../processes/exec.h"
+#include "../qc/qproc.h"
+
 
 extern void enter_user_mode();
 extern uint32_t tss_start;

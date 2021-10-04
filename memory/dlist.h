@@ -1,22 +1,16 @@
-#ifndef NULL
-#define NULL 0
-#endif
 
-#ifndef TRUE
+
+#ifndef DLIST_H
+#define DLIST_H
+
+
 #define TRUE 1
-#endif
 
-#ifndef FALSE
 #define FALSE 0
-#endif
 
-#ifndef USED 
 #define USED FALSE
-#endif
 
-#ifndef FREE
 #define FREE TRUE
-#endif
 
 
 #include <stdbool.h>
@@ -47,6 +41,14 @@ typedef struct dlist_kheap {
 	struct dlist_kheap* right_link;
 	
 } dlist_kheap;
+
+typedef struct klist {
+	uint32_t ptr;
+	struct klist* next;
+	struct klist* prev;
+
+
+} klist;
 
 
 void create_list(dlist* ptr_to_head, int mem_kval) {
@@ -128,3 +130,24 @@ int sizeof_list(dlist* list_head) {
 	return total;
 } 
 
+
+klist* create_klist() {
+	klist* head = (klist*)kmalloc(sizeof(klist));	
+	head->next = head;
+	head->prev = head;
+	head->ptr = 0xDEADC0DE;
+	return head;
+}
+
+void add_klist(klist* head, uint32_t ptr_to_data) {
+	klist* new_element = (klist*)kmalloc(sizeof(klist));
+	new_element->ptr = ptr_to_data;
+	new_element->next = head;
+	new_element->prev = head->prev;
+	head->prev->next = new_element;
+	head->prev = new_element;
+
+}
+
+
+#endif

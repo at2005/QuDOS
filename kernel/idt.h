@@ -72,7 +72,9 @@ void initialize_idt() {
 	extern int int30();
 	extern int int31();
 	
-	
+	// manually key in idt entry values (without loop) since 
+	// some options are different and also it is easier to toggle them
+	// on and off like this
 	
 	IDT[0].offset_low = (uint32_t)int0 & 0xFFFF;
 	IDT[0].offset_high = ((uint32_t)int0 &  0xFFFF0000) >> 16;
@@ -287,7 +289,6 @@ void initialize_idt() {
 	extern int irq13();
 	extern int irq14();
 	extern int irq15();
-
 	
 	// declare irq handler addresses
 	uint32_t irq0_address = (uint32_t)irq0;
@@ -307,6 +308,7 @@ void initialize_idt() {
 	uint32_t irq14_address = (uint32_t)irq14;
 	uint32_t irq15_address = (uint32_t)irq15;
 	
+
 	uint32_t arr_of_addresses[16] = {irq0_address, irq1_address, irq2_address, irq3_address, irq4_address, irq5_address,irq6_address, irq7_address, irq8_address, irq9_address, irq10_address, irq11_address, irq12_address, irq13_address, irq14_address, irq15_address};
 	// give both PIC controllers initialze commands
 	// command to write
@@ -356,6 +358,14 @@ void initialize_idt() {
 	IDT[128].offset_high = syscall_address >> 16;
 	IDT[128].selector = 0x08;
 	IDT[128].type = 0b11101110;
+	
+	
+	extern int irq64();
+	uint32_t qcall_address = (uint32_t)irq64;
+	IDT[64].offset_low = qcall_address & 0x0000FFFF;
+	IDT[64].offset_high = qcall_address >> 16;
+	IDT[64].selector = 0x08;
+	IDT[64].type = 0b11101110;
 
 
 	extern int lidt_asm();
@@ -365,6 +375,9 @@ void initialize_idt() {
 }
 
 
+
+
+
 typedef struct sys_args {
 	uint32_t eax;
 	uint32_t ebx;
@@ -372,6 +385,16 @@ typedef struct sys_args {
 	uint32_t edx;
 
 } sys_args;
+
+uint32_t* get_page();
+
+uint32_t qcall_handler(sys_args qparams) {
+	if(qparams.eax == 0) {
+		print_hex(get_page());
+	
+	}	
+
+}
 
 
 uint32_t syscall_handler(sys_args params) {
@@ -393,11 +416,6 @@ uint32_t syscall_handler(sys_args params) {
 		
 		}
 	}
-	//print(a);
-	//print_char((char)a, GREEN_ON_BLACK);
-	//print_hex(a);
-	//*(unsigned char*)(0xB8000) = 'a';
-	//print((char*)system_call_args.eax);
 	
 
 }

@@ -10,7 +10,7 @@ rm test2.o
 
 nasm -felf32 -o shell/sys.o shell/sys.asm
 
-gcc -ffreestanding -fno-pie -m32 -c shell/shell.c -o shell/shell.o
+gcc -Wall -ffreestanding -fno-pie -m32 -c shell/shell.c -o shell/shell.o
 ld shell/sys.o shell/shell.o -o shell/shell.bin -melf_i386
 
 

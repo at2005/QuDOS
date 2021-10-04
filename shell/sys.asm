@@ -5,7 +5,7 @@ global printf
 global _start
 global printh
 global scanf
-
+global quant
 
 _start:
 	call main
@@ -49,3 +49,11 @@ scanf:
 		
 	ret
 
+
+quant:
+	mov eax,0
+	mov ebx,0
+	mov ecx,0
+	mov edx,0
+	int 0x40
+	ret
