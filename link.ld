@@ -3,7 +3,6 @@
 INPUT(
 	kernel/lkernel.o
 	processes/tss.o
-	processes/switch.o
 	memory/set_paging.o
 	kernel/irq.o
 	kernel/kernel.o

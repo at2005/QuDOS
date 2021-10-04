@@ -9,26 +9,13 @@ static uint8_t start_timer;
 #include "../kernel/print.h"
 
 
-extern uint32_t cswitch();
-
-
-
-uint32_t schedule(registers regs) {
+uint32_t schedule() {
 	
 	if(start_timer) {
-		// save registers
-		current_proc->local_registers.eax = regs.eax;
-		current_proc->local_registers.ebx = regs.ebx;
-		current_proc->local_registers.ecx = regs.ecx;
-		current_proc->local_registers.edx = regs.edx;
-		current_proc->local_registers.esi = regs.esi;
-		current_proc->local_registers.edi = regs.edi;
-		
 		current_proc = current_proc->next_proc;
 		
 		if(current_proc->eip == 0xDEADC0DE) current_proc = current_proc->next_proc;
 
-	//	return cswitch(stack_ptr,flags, ip);
 		return current_proc->local_stack.esp;	
 	}	
 	
@@ -36,13 +23,35 @@ uint32_t schedule(registers regs) {
 }
 
 
-void save_stack(uint32_t esp) {
 
+void save_context(registers regs, uint32_t esp) {
 	if(start_timer) {
+		current_proc->local_registers = regs;
 		current_proc->local_stack.esp = esp;
-	}	
+		pframe_entry* frame_list = current_proc->pf_list;
+		pframe_entry* curr_element = frame_list->next_pf;
+		
+		while(curr_element != frame_list) {
+			
+//			print_hex(curr_element->addr);
+
+			curr_element = curr_element->next_pf;
+		
+		}
+	
+	}
 
 }
+
+
+registers* restore_context() {
+
+	return &(current_proc->local_registers);
+
+
+}
+
+
 
 int get_timer() {
 	return start_timer;

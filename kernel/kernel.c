@@ -7,8 +7,9 @@
 #include "../drivers/block.h"
 #include "../fsys/fs.h"
 #include "../fsys/fmanage.h"
-
 #include "../processes/readelf.h"
+#include "../processes/exec.h"
+
 extern void enter_user_mode();
 extern uint32_t tss_start;
 extern void user_func();
@@ -68,7 +69,9 @@ void main() {
 	pstack_init->user_cs = 0x1B;
 	pstack_init->proc_ip = new_proc->eip;
 	current_proc = new_proc;
-			
+
+//	fork(new_proc);
+
 	start_timer = 1;
 	enter_user_mode();
 

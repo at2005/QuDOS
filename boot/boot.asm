@@ -20,12 +20,10 @@ mov bx, 0x5000
 
 call read ; call read BIOS function
 
-;pusha
 mov si,read_succ
 call print
 
 
-;popa
 
 switch_pm:
 		

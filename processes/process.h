@@ -12,7 +12,7 @@
 
 #include <stddef.h>
 
-int* kmalloc(size_t bytes_req);
+void* kmalloc(size_t bytes_req);
 
 typedef struct pframe_entry {
 	uint32_t* addr;

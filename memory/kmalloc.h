@@ -25,7 +25,7 @@ void init_kernel_mem() {
 
 
 
-int* kmalloc(size_t bytes_req) {
+void* kmalloc(size_t bytes_req) {
 	// current node in list to list head
 	dlist_kheap* current_node = &kernel_mem_head;
 	while(1) {
@@ -52,16 +52,21 @@ int* kmalloc(size_t bytes_req) {
 }
 
 
-void free(int* pointer) {
+void kfree(void* pointer) {
+	// get descriptor for memory region
 	dlist_kheap* block_desc = (dlist_kheap*)((int)pointer - sizeof(dlist_kheap));
+	// get descriptor for next block
 	dlist_kheap* ptr_to_next = (dlist_kheap*)((int)pointer + block_desc->size);
 
+	// if next block is free
 	if(ptr_to_next->used == FALSE) {
+		// remove next block
 		remove_element_kheap(ptr_to_next);
+		// increase size of current block to cover this block + next
 		block_desc->size = block_desc->size + ptr_to_next->size;	
 	}
 	
-
+	// add block to free list
 	add_element_kheap(&kernel_mem_head, block_desc);
 	
 	

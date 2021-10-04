@@ -23,7 +23,6 @@ nasm -felf32 -o kernel/lkernel.o kernel/lkernel.asm
 nasm -felf32 -o kernel/irq.o kernel/irq.asm
 nasm -felf32 -o memory/set_paging.o memory/set_paging.asm
 nasm -felf32 -o processes/tss.o processes/tss.asm
-nasm -felf32 -o processes/switch.o processes/switch.asm
 
 echo "Finished assembling..."
 
@@ -58,3 +57,4 @@ rm osimage.img
 rm -r kernel/*.tmp
 rm shell/*.o
 rm shell/*.bin
+rm -r *.bin

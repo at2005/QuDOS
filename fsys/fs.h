@@ -46,7 +46,7 @@ void init_fs() {
 	block_write(2, (uint16_t*)inode_buffer);
 	
 	// free inode from buffer
-	free((int*)inode_buffer);
+	kfree((int*)inode_buffer);
 	
 	// set up files/dirs in root folder
 	char filename[4] = "bin\0";
@@ -75,7 +75,7 @@ void init_fs() {
 	block_write(1, (uint16_t*)data_bitmap);	
 	
 	// free memory
-	free((int*)files_in_root);	
+	kfree((int*)files_in_root);	
 
 
 }

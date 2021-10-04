@@ -483,7 +483,7 @@ while(1);
 void page_fault_handler() {
 	print("\nPage Fault!\n");
 	
-	__asm__("jmp 0x15000");
+	//__asm__("jmp 0x15000");
 while(1);
 }
 

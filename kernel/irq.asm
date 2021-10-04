@@ -55,8 +55,9 @@ global int31
 [extern simd_float_handler]
 [extern virtual_handler]
 [extern security_handler]
-[extern save_stack]
+[extern save_context]
 [extern get_timer]
+[extern restore_context]
 
 global irq0
 global irq1
@@ -320,16 +321,15 @@ irq0:
 	push ecx
 	
 	; store new user stack pointer
-	mov ecx, esp
+	mov dword [sp_temp], esp
 	; restore kernel stack
 	mov esp, ebx	
-		
-	push ecx
-	call save_stack
-	add esp, 4	
-
+	
+	; pop registers off
 	popad
 
+	; save stack pointer
+	push dword [sp_temp]
 	; save register context
 	push esi
 	push edi
@@ -337,27 +337,45 @@ irq0:
 	push ecx
 	push ebx
 	push eax
+
+	call save_context
+	
+	add esp,28
 	
 	; call the scheduler
  	call schedule	
 	
-	; fix the stack
-	add esp, 24
-	
+
 	; check if timer has started and go to end if not
 	cmp eax, 0
 	je std
 	
-	mov esp, eax
+	mov dword [sp_temp], eax
 	
-
+	call restore_context
+	
+	mov edi, [eax+20]
+	mov esi, [eax+16]
+	mov edx, [eax+12]
+	mov ecx, [eax+8]
+	mov ebx, [eax+4]
+	mov eax, [eax]
+	
+		
+	mov esp, dword [sp_temp]
+	
+	
 		
 	std:
+		pushad
 		mov dx, 0x20
 		mov al, 0x20
 		out dx, al
+		popad
 		iret
 	
+
+	sp_temp dd 0
 	
 
 irq1: 
