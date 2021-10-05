@@ -4,7 +4,7 @@
 
 #include "../memory/dlist.h"
 
-enum QSTATE {ACTIVE, DORMANT};
+typedef enum QSTATE {ACTIVE, DORMANT} QSTATE;
 
 
 typedef struct qproc_info {
@@ -12,8 +12,11 @@ typedef struct qproc_info {
 	uint32_t qpid;
 	uint8_t* qdata;
 	uint32_t qdatasz;
+	QSTATE state;
+		
 
 } qproc_info;
+
 
 
 void qschedule() {

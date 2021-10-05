@@ -1,8 +1,10 @@
+#include <stddef.h>
+#include <stdint.h>
 
 extern void printf(char* in);
 extern void printh(int a);
 extern void scanf(char* buffer);
-extern void quant();
+extern uint32_t quant();
 
 void flush(char* buffer) {
 
@@ -16,7 +18,7 @@ int main() {
 	flush(buffer);
 		
 	while(1) {
-		quant();	
+		printh(quant());	
 		printf("A> ");
 		scanf(buffer);
 		if(buffer[0] == 'h' && buffer[1] == 'i') printf("hello to you too!");

@@ -6,7 +6,7 @@
 #include "keyboard.h"
 #include "../processes/schedule.h"
 #include "../drivers/ata.h"
-
+#include "syscall.h"
 
 #define PICM_CONTROL 0x20
 #define PICS_CONTROL 0xA0
@@ -378,19 +378,12 @@ void initialize_idt() {
 
 
 
-typedef struct sys_args {
-	uint32_t eax;
-	uint32_t ebx;
-	uint32_t ecx;
-	uint32_t edx;
 
-} sys_args;
-
-uint32_t* get_page();
+uint32_t fetch_vpage();
 
 uint32_t qcall_handler(sys_args qparams) {
 	if(qparams.eax == 0) {
-		print_hex(get_page());
+		return fetch_vpage();
 	
 	}	
 
@@ -501,7 +494,7 @@ while(1);
 void page_fault_handler() {
 	print("\nPage Fault!\n");
 	
-	//__asm__("jmp 0x15000");
+	__asm__("jmp 0x15000");
 while(1);
 }
 

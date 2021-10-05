@@ -58,7 +58,7 @@ void main() {
 	// set up new process stack
 	uint32_t* stack_bottom = (uint32_t*)0x09000000;
 	// map stack to a physical page frame
-	map_page((uint32_t)stack_bottom);
+	kmmap((uint32_t)stack_bottom);
 	// set stack to hold iret information
 	new_proc->local_stack.esp = ((uint32_t)stack_bottom + 0xFFA) - sizeof(iret_stack);
 	// 

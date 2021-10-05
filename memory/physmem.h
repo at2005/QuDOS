@@ -150,7 +150,7 @@ uint32_t get_ptoffset(uint32_t addr) {
 }
 
 
-uint32_t map_page(uint32_t addr) {
+uint32_t kmmap(uint32_t addr) {
 	uint32_t* page_dir = getpd();
 	// get page dir offset and page table offset
 	uint32_t pd_offset = get_pde(addr);
@@ -171,6 +171,17 @@ uint32_t map_page(uint32_t addr) {
 	page_table[pt_offset] = (uint32_t)page_frame | 7;
 	
 	return page_frame;
+
+}
+
+uint32_t fetch_vpage() {
+	uint32_t* page_dir = getpd();
+	uint32_t page = get_page();
+	uint32_t pd_offset = get_pde(page);
+	uint32_t pt_offset = get_ptoffset(page);
+	uint32_t* page_table = (uint32_t*)(page_dir[pd_offset] & 0xFFFFF000);
+	page_table[pt_offset] = (uint32_t)page | 7;
+	return page;
 
 }
 

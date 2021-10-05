@@ -466,28 +466,26 @@ irq15:
 	popa
 	iret
 	
-irq128:
-	;pusha
-	push edx
-	push ecx
-	push ebx
-	push eax
-	call syscall_handler
-	add esp, 16
-	;popa
-	iret
-
-
 irq64:
-	pushad
 	push edx
 	push ecx
 	push ebx
 	push eax
 	call qcall_handler
 	add esp,16
-	popad
 	iret	
+
+
+irq128:
+	push edx
+	push ecx
+	push ebx
+	push eax
+	call syscall_handler
+	add esp, 16
+	iret
+
+
 
 	
 
