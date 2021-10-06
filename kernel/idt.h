@@ -7,6 +7,7 @@
 #include "../processes/schedule.h"
 #include "../drivers/ata.h"
 #include "syscall.h"
+#include "../qc/qproc.h"
 
 #define PICM_CONTROL 0x20
 #define PICS_CONTROL 0xA0
@@ -383,7 +384,8 @@ uint32_t fetch_vpage();
 
 uint32_t qcall_handler(sys_args qparams) {
 	if(qparams.eax == 0) {
-		return fetch_vpage();
+		
+		return create_qproc()->qdata;
 	
 	}	
 
@@ -391,25 +393,8 @@ uint32_t qcall_handler(sys_args qparams) {
 
 
 uint32_t syscall_handler(sys_args params) {
-	if(params.eax == 1) {
-		print((char*)params.ebx);
-	}
-	
-	else if(params.eax == 2) print_hex(params.ebx);
-
-	else if(params.eax == 3) {
-		if(params.ecx == 0) {
-			enable_keyboard();
-			char_buff = (char*)params.ebx;
-			buff_count= 0;
-		}
-		
-		else if(params.ecx == 1) {
-			return keyboard_enabled;		
-		
-		}
-	}
-	
+	uint32_t (*ptr)(sys_args) = (uint32_t (*) (sys_args))(tcodes[params.eax][params.ecx]); 
+	(*ptr)(params);
 
 }
 

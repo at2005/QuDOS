@@ -41,7 +41,8 @@ void main() {
 	
 	// initialize the file system if not already
 	init_fs();
-	
+	qproc_init();	
+	init_syscall();	
 	// set up a 12KB buffer
 	uint16_t* buff = (uint16_t*)kmalloc(4096*3);
 		
