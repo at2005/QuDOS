@@ -78,7 +78,7 @@ int* id_map(int flag) {
 	//pd[3] = (uint32_t)pt16MB | 7;
 	
 	
-	for(int i = 4; i < 1024; i++) {
+	for(int i = 3; i < 1024; i++) {
 		pd[i] = (uint32_t)2;
 
 	}

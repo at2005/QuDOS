@@ -13,12 +13,12 @@ void flush(char* buffer) {
 }
 
 int main() {
-	printf("QOS Developed By Ayush Tambde (2021)\n\n");
+	/*printf("QOS Developed By Ayush Tambde (2021)\n\n");
 	char buffer[256];
 	flush(buffer);
 		
 	while(1) {
-		printh(quant());	
+	//	printh(quant());	
 		printf("A> ");
 		scanf(buffer);
 		if(buffer[0] == 'h' && buffer[1] == 'i') printf("hello to you too!");
@@ -27,7 +27,12 @@ int main() {
 		flush(buffer);	
 	}
 	
+	*/
 	
+	uint8_t* buffer = (uint8_t*)quant();
+		
+
+
 	return 0;
 }
 

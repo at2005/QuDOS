@@ -385,7 +385,7 @@ uint32_t fetch_vpage();
 uint32_t qcall_handler(sys_args qparams) {
 	if(qparams.eax == 0) {
 		
-		return create_qproc()->qdata;
+		return (create_qproc()->qdata);
 	
 	}	
 
@@ -479,7 +479,7 @@ while(1);
 void page_fault_handler() {
 	print("\nPage Fault!\n");
 	
-	__asm__("jmp 0x15000");
+//	__asm__("jmp 0x15000");
 while(1);
 }
 

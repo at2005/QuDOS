@@ -178,6 +178,15 @@ uint32_t fetch_vpage() {
 	uint32_t* page_dir = getpd();
 	uint32_t page = get_page();
 	uint32_t pd_offset = get_pde(page);
+	
+
+	if(page_dir[pd_offset] == 0x2) {
+		// if not then map	
+		uint32_t* pt_addr = get_pts_page();
+		page_dir[pd_offset] = (uint32_t)pt_addr | 7;
+	
+	}
+	
 	uint32_t pt_offset = get_ptoffset(page);
 	uint32_t* page_table = (uint32_t*)(page_dir[pd_offset] & 0xFFFFF000);
 	page_table[pt_offset] = (uint32_t)page | 7;

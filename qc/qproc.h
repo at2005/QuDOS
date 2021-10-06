@@ -33,6 +33,7 @@ qproc_struct* create_qproc() {
 	qproc_struct* new_qproc  = (qproc_struct*)kmalloc(sizeof(qproc_struct));
 	new_qproc->qdata = (uint8_t*)fetch_vpage();
 	new_qproc->qdatasz = 1;
+	*(new_qproc->qdata) = 2;
 	new_qproc->state = DORMANT;
 	add_klist(qlist, (uint32_t)new_qproc);
 	return new_qproc;
