@@ -13,7 +13,7 @@ void flush(char* buffer) {
 }
 
 int main() {
-	/*printf("QOS Developed By Ayush Tambde (2021)\n\n");
+	printf("QOS Developed By Ayush Tambde (2021)\n\n");
 	char buffer[256];
 	flush(buffer);
 		
@@ -27,9 +27,9 @@ int main() {
 		flush(buffer);	
 	}
 	
-	*/
 	
-	uint8_t* buffer = (uint8_t*)quant();
+	
+	//uint8_t* buffer = (uint8_t*)quant();
 		
 
 
