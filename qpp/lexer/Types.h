@@ -2,8 +2,8 @@
 #define TYPES_H
 
 #include <string>
-#include "../circuit/gates.h"
 #include <unordered_map>
+using namespace std;
 
 // struct holds hash tables that contain the lexemes
 
