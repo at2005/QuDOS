@@ -86,7 +86,7 @@ process_struct* read_elf(uint8_t* buffer) {
 		
 			// map each virtual page to a physical page frame
 			for(int page = 0; page < num_pages; page++) {
-				uint32_t page_frame = map_page(load_address+page*0x1000);
+				uint32_t page_frame = kmmap(load_address+page*0x1000);
 				create_pfe(proc_pfhead, (uint32_t*)(page_frame));
 
 			}

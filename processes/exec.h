@@ -22,7 +22,7 @@ uint32_t fork(process_struct* proc) {
 
 		memcpy((uint8_t*)(page_to_cpy), page_buff, 4096); 
 		
-		create_pfe(new_pfhead, (uint32_t*)(map_page(page_to_cpy)));
+		create_pfe(new_pfhead, (uint32_t*)(kmmap(page_to_cpy)));
 
 		// advance to next element
 		curr_pf = curr_pf->next_pf;

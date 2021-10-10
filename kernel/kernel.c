@@ -10,7 +10,7 @@
 #include "../processes/readelf.h"
 #include "../processes/exec.h"
 #include "../qc/qproc.h"
-
+#include "../drivers/pci.h"
 
 extern void enter_user_mode();
 extern uint32_t tss_start;
@@ -40,8 +40,12 @@ void main() {
 	int* pd = id_map(1);
 	
 	// initialize the file system if not already
+
+	check_bus();	
+
 	init_fs();
-	
+	qproc_init();	
+	init_syscall();	
 	// set up a 12KB buffer
 	uint16_t* buff = (uint16_t*)kmalloc(4096*3);
 		
@@ -58,7 +62,7 @@ void main() {
 	// set up new process stack
 	uint32_t* stack_bottom = (uint32_t*)0x09000000;
 	// map stack to a physical page frame
-	map_page((uint32_t)stack_bottom);
+	kmmap((uint32_t)stack_bottom);
 	// set stack to hold iret information
 	new_proc->local_stack.esp = ((uint32_t)stack_bottom + 0xFFA) - sizeof(iret_stack);
 	// 
@@ -74,14 +78,8 @@ void main() {
 
 //	fork(new_proc);
 
-	start_timer = 1;
-	enter_user_mode();
-
+	//start_timer = 1;
+	//enter_user_mode();
 
 
 }	
-
-
-
-
-

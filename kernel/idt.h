@@ -6,7 +6,8 @@
 #include "keyboard.h"
 #include "../processes/schedule.h"
 #include "../drivers/ata.h"
-
+#include "syscall.h"
+#include "../qc/qproc.h"
 
 #define PICM_CONTROL 0x20
 #define PICS_CONTROL 0xA0
@@ -378,19 +379,13 @@ void initialize_idt() {
 
 
 
-typedef struct sys_args {
-	uint32_t eax;
-	uint32_t ebx;
-	uint32_t ecx;
-	uint32_t edx;
 
-} sys_args;
-
-uint32_t* get_page();
+uint32_t fetch_vpage();
 
 uint32_t qcall_handler(sys_args qparams) {
 	if(qparams.eax == 0) {
-		print_hex(get_page());
+		
+		return (create_qproc()->qdata);
 	
 	}	
 
@@ -398,25 +393,8 @@ uint32_t qcall_handler(sys_args qparams) {
 
 
 uint32_t syscall_handler(sys_args params) {
-	if(params.eax == 1) {
-		print((char*)params.ebx);
-	}
-	
-	else if(params.eax == 2) print_hex(params.ebx);
-
-	else if(params.eax == 3) {
-		if(params.ecx == 0) {
-			enable_keyboard();
-			char_buff = (char*)params.ebx;
-			buff_count= 0;
-		}
-		
-		else if(params.ecx == 1) {
-			return keyboard_enabled;		
-		
-		}
-	}
-	
+	uint32_t (*ptr)(sys_args) = (uint32_t (*) (sys_args))(tcodes[params.eax][params.ecx]); 
+	(*ptr)(params);
 
 }
 
@@ -501,7 +479,7 @@ while(1);
 void page_fault_handler() {
 	print("\nPage Fault!\n");
 	
-	//__asm__("jmp 0x15000");
+//	__asm__("jmp 0x15000");
 while(1);
 }
 
