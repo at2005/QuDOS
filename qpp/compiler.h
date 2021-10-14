@@ -4,6 +4,11 @@
 #include <fstream>
 
 
+static int counter = 0;
+
+void inc_lcounter() {
+	counter++;
+}
 
 
 static struct  {
@@ -50,13 +55,32 @@ string get_free_reg() {
 
 }
 
-void write_reg(int a) {}
-int lookup() {}
 
-void add_compile(string target, string b) {
-	
+void free_reg(string reg) {
+	if(reg == "eax") free_regs.eax = 0;
+	else if(reg == "ebx") free_regs.ebx = 0;
+	else if(reg == "ecx") free_regs.ecx = 0;
+	else if(reg == "edx") free_regs.edx = 0;
+	else if(reg == "edx") free_regs.edx = 0;
+	else if(reg == "esi") free_regs.esi = 0;
+	else if(reg == "edi") free_regs.edi = 0;
+}
+
+
+string get_word_reg(string reg) {
+	if(reg == "ecx") return "cx";
+
 
 }
+
+string get_byte_reg(string reg) {
+	if(reg == "ecx") return "cl";
+
+}
+
+
+void write_reg(int a) {}
+int lookup() {}
 
 
 static ofstream file("./out.asm");
@@ -73,9 +97,34 @@ string compile(SyntaxTree* st) {
 		
 		if(root->getTValue() == "+") file << "add " << lreg << "," << rreg << endl;
 		else if(root->getTValue() == "-") file << "sub " << lreg << "," << rreg << endl;
-		else if (root->getTValue() == "*") file << "imul " << lreg << "," << rreg << endl;	
+		else if (root->getTValue() == "*") file << "imul " << lreg << "," << rreg << endl;
+		
+		free_reg(rreg);
+	
 		return lreg;
 	}
+
+
+	else if(root->getTToken() == "COMPARISON_OPERATOR") {
+		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
+		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
+		string lreg = compile(&left_tree);
+		string rreg = compile(&right_tree);
+		
+		file << "cmp " << lreg << "," << rreg << endl;
+		
+		if(root->getTValue() == ">") {
+			string reg = get_free_reg();
+			string byte_reg = get_byte_reg(reg);
+			file << "and " << reg << "," << "0x0" << endl;	
+			file << "setg " << byte_reg << endl;
+			return reg;
+		}		
+		
+		
+
+	
+	}	
 
 	else if(root->getTToken() == "NUMBER") {
 		string val = root->getTValue();

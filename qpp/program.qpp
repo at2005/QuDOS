@@ -1,7 +1,7 @@
 
 
 function main() {	
-	int a = (9 + 4) + (8 * 7);
+	int a = 7 > 2;
 
 }
 
