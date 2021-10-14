@@ -37,22 +37,30 @@ uint8_t get_header(uint8_t bus, uint8_t device) {
 	return header_type;			
 }
 
+
+uint32_t get_bar(uint8_t bus, uint8_t device, uint8_t func) {
+	uint32_t bar = pci_read(bus, device, func, 0x10) >> 2;
+	return bar;
+	
+
+}
+
+
 void check_bus() {
 	for(int i = 0; i < 256; i++) {
 		for(int j = 0; j < 32; j++) {
 			if(!validate_vendor(i, j, 0)) continue;
 			uint8_t header = get_header(i,j);
-			
-			print_hex(pci_read(i,j,0,0x8));
-			
+				
 			switch(header) {
-				//case 0:
-				//	print_hex(pci_read(i,j,0, 0x0));
+				case 0:
+					print_hex((pci_read(i,j,0, 0x10) & 0xFFFFFFFC) >> 4);
 				
 				case 0x80:
+					print_hex(pci_read(i,j,0,0x10) >> 2);
 					for(int function = 1; function < 8; function++) {
 						if(!validate_vendor(i,j, function)) continue;
-						print_hex(pci_read(i,j,function,0x8));
+						print_hex(pci_read(i,j,function, 0x10) >> 2);
 					}
 				//	print_hex(pci_read(i,j,0, 0x0));	
 			}

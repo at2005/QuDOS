@@ -1,7 +1,8 @@
 
 
-function main() {
-	
-
+function main() {	
+	int a = (9 + 4) + (8 * 7);
 
 }
+
+
