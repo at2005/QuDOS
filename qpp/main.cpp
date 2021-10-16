@@ -27,12 +27,17 @@ int main() {
 	Node* root = main_tree->getRoot();
 	
 	free_regs = {0,0,0,0,0,0};
+	file << "[extern printh]";
 	file << "section .text:\nglobal main\nmain:\n";
 	
-	compile(&(main_tree->get_child_trees()[0]));	
+
+
+	for(int i = 0; i < main_tree->get_child_trees().size(); i++) { 
+		compile(&(main_tree->get_child_trees()[i]));	
+	}
 	
-	
-	
+	file << "add esp," << var_counter*4 << endl;	
+	file << "ret";	
 
 	return 0;
 

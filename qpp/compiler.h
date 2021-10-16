@@ -3,14 +3,14 @@
 #include "parser/SyntaxTree.h"
 #include <fstream>
 
-
+// create global variables
+static int jmp_flag = 0;
 static int counter = 0;
+static int var_counter = 0;
+static int within_scope = 0;
 
-void inc_lcounter() {
-	counter++;
-}
-
-
+std::unordered_map<string,int> symbol_table = {};
+// holds the status of each register
 static struct  {
 	uint32_t eax;
 	uint32_t ebx;
@@ -21,6 +21,7 @@ static struct  {
 
 } free_regs;
 
+// method to check whether reg is free and return if so
 string get_free_reg() {
 	if(free_regs.eax == 0) {
 		free_regs.eax = 1;
@@ -56,6 +57,7 @@ string get_free_reg() {
 }
 
 
+// free a given register
 void free_reg(string reg) {
 	if(reg == "eax") free_regs.eax = 0;
 	else if(reg == "ebx") free_regs.ebx = 0;
@@ -67,20 +69,30 @@ void free_reg(string reg) {
 }
 
 
+// split a 32-bit register into its 16-bit counterpart
 string get_word_reg(string reg) {
-	if(reg == "ecx") return "cx";
-
+	if(reg == "eax") return "ax";
+	else if(reg == "ebx") return "bx";
+	else if(reg == "ecx") return "cx";
+	else if(reg == "edx") return "dx";
+	else if(reg == "esi") return "si";
+	else if(reg == "edi") return "di";
+	return "";
 
 }
 
+
+
+// split a 32-bit register into its 8-bit counterpart
 string get_byte_reg(string reg) {
 	if(reg == "ecx") return "cl";
-
+	return "";
 }
+
 
 
 void write_reg(int a) {}
-int lookup() {}
+int lookup() {return 0;}
 
 
 static ofstream file("./out.asm");
@@ -88,6 +100,8 @@ static ofstream file("./out.asm");
 string compile(SyntaxTree* st) {
 
 	Node* root = st->getRoot();
+	
+
 	if(root->getTToken() == "OPERATOR") { 
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
@@ -95,10 +109,12 @@ string compile(SyntaxTree* st) {
 		string lreg = compile(&left_tree);
 		string rreg = compile(&right_tree);
 		
-		if(root->getTValue() == "+") file << "add " << lreg << "," << rreg << endl;
-		else if(root->getTValue() == "-") file << "sub " << lreg << "," << rreg << endl;
-		else if (root->getTValue() == "*") file << "imul " << lreg << "," << rreg << endl;
-		
+		string op_type = "";
+		if(root->getTValue() == "+") op_type = "add ";
+		else if(root->getTValue() == "-") op_type = "sub ";
+		else if (root->getTValue() == "*") op_type = "imul ";
+		else if(root->getTValue() == "/") op_type = "idiv ";	
+		file << op_type  << lreg << "," << rreg << endl;
 		free_reg(rreg);
 	
 		return lreg;
@@ -113,18 +129,55 @@ string compile(SyntaxTree* st) {
 		
 		file << "cmp " << lreg << "," << rreg << endl;
 		
+		string cmp_type;
+
 		if(root->getTValue() == ">") {
+			if(!jmp_flag) cmp_type = "setg "; 
+			else cmp_type = "jle ";
+		}
+		
+		else if(root->getTValue() == ">=") {
+			if(!jmp_flag) cmp_type = "setge ";
+		       	else cmp_type = "jl ";
+		}
+
+		else if(root->getTValue() == "<") {
+			if(!jmp_flag) cmp_type = "setl ";
+		       	else cmp_type = "jge ";
+		}
+
+		else if(root->getTValue() == "<=") {
+			if(!jmp_flag) cmp_type = "setle ";
+		       	else cmp_type = "jg ";
+		}
+
+		else if(root->getTValue() == "==") {
+			if(!jmp_flag) cmp_type = "sete ";
+		       	else cmp_type = "jne ";
+		}
+
+		else if(root->getTValue() == "!=") {
+		       	if(!jmp_flag) cmp_type = "setne ";
+		       	else cmp_type = "je ";
+		}
+		
+		if(!jmp_flag) {
 			string reg = get_free_reg();
 			string byte_reg = get_byte_reg(reg);
 			file << "and " << reg << "," << "0x0" << endl;	
-			file << "setg " << byte_reg << endl;
-			return reg;
-		}		
-		
+			file << cmp_type << byte_reg << endl;
+			return reg;	
+		}
 		
 
+		
+		string label = "l" + to_string(counter);	
+		counter++;
+		file << cmp_type << label << endl;
+		return label;			
 	
 	}	
+
 
 	else if(root->getTToken() == "NUMBER") {
 		string val = root->getTValue();
@@ -134,17 +187,53 @@ string compile(SyntaxTree* st) {
 	}		
 
 	else if(root->getTToken() == "IDENTIFIER") {
-				
+		cout << var_counter << endl;
+		return " dword [esp+" + to_string(4*(var_counter - (symbol_table[root->getTValue()] + 1))) + "]";		
 	
 	}
 
 	else if(root->getTToken() == "ASSIGNMENT") {
+
+		string var_name = root->getLeftChild()->getTValue();
+		symbol_table.insert({var_name, var_counter});
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 		string res = compile(&right_tree);
 		file << "push " << res << endl;
+		free_reg(res);
+		var_counter++;
+		return res;
 	
 	}
+
+
+	else if(root->getTValue() == "if") {
+		within_scope++;
+		jmp_flag = 1;
+		SyntaxTree cond_tree = SyntaxTree(root->getLeftChild());
+		string lbl = compile(&cond_tree);
+		
+		for(int i = 0; i < st->get_child_trees().size(); i++) {
+			SyntaxTree* child = &(st->get_child_trees()[i]);
+			compile(child);
+		
+		}
+		
+		file << lbl  << ":\n";
+		
+		within_scope--;
+		return "";	
+			
+	}
+
+
+	else if(root->getTValue() == "printh") {
+		file << "call printh\n";
+		return "printh";
+	}
+
+
+	file << "jmp $";
 	
 	file.close();
-
+	return "";
 }

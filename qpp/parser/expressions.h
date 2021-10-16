@@ -94,8 +94,8 @@ inline string rtnExprType(vector<Pair> input) {
 		return "SYNTAX_ERROR";
 	}
 
-
-
+	cerr << "SYNTAX_ERROR";
+	return "SYNTAX_ERROR";
 
 }
 

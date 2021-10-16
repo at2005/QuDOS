@@ -1,8 +1,26 @@
+int function add_one(int x) {
+	x += 1;
+	return x;
+	
+}
 
 
 function main() {	
-	int a = 7 > 2;
+	if(10 > 2) {
+		int a = 2 + 4;
+		int d = a + 5;
+		printh();	
+	
+	}
+
+	int b = 3 + 9;
+	printh();
+	int c = b - 2;
+	printh();
+	
 
 }
+
+
 
 

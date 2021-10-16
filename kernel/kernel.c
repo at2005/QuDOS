@@ -41,7 +41,7 @@ void main() {
 	
 	// initialize the file system if not already
 
-	check_bus();	
+//	check_bus();	
 
 	init_fs();
 	qproc_init();	
@@ -79,7 +79,7 @@ void main() {
 //	fork(new_proc);
 
 	//start_timer = 1;
-	//enter_user_mode();
+	enter_user_mode();
 
 
 }	
