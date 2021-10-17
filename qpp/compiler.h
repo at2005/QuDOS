@@ -9,7 +9,30 @@ static int counter = 0;
 static int var_counter = 0;
 static int within_scope = 0;
 
-std::unordered_map<string,int> symbol_table = {};
+typedef struct symtab {
+	std::unordered_map<string, int> table;
+	struct symtab* parent_table; 
+
+} symtab;
+
+// recursive search the symbol table
+int search_symtab(symtab* tab, string var_name) {
+	
+	
+	if(tab->table.find(var_name) != tab->table.end()) {
+		return tab->table.find(var_name)->second;
+
+	}
+
+
+	return search_symtab(tab->parent_table, var_name);
+	
+
+
+
+}
+
+
 // holds the status of each register
 static struct  {
 	uint32_t eax;
@@ -97,7 +120,7 @@ int lookup() {return 0;}
 
 static ofstream file("./out.asm");
 
-string compile(SyntaxTree* st) {
+string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	Node* root = st->getRoot();
 	
@@ -106,9 +129,17 @@ string compile(SyntaxTree* st) {
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 
-		string lreg = compile(&left_tree);
-		string rreg = compile(&right_tree);
+		string lreg = compile(&left_tree, symbol_table);
+		string rreg = compile(&right_tree, symbol_table);
 		
+		if(root->getRightChild()->getTToken() == "IDENTIFIER") {
+			string temp_reg = get_free_reg();
+			file << "mov " << temp_reg << "," << rreg << endl;
+			rreg = temp_reg;
+
+		}
+
+
 		string op_type = "";
 		if(root->getTValue() == "+") op_type = "add ";
 		else if(root->getTValue() == "-") op_type = "sub ";
@@ -124,11 +155,23 @@ string compile(SyntaxTree* st) {
 	else if(root->getTToken() == "COMPARISON_OPERATOR") {
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
-		string lreg = compile(&left_tree);
-		string rreg = compile(&right_tree);
+
+		string lreg = compile(&left_tree, symbol_table);
+		string rreg = compile(&right_tree, symbol_table);
+		
+		if(root->getRightChild()->getTToken() == "IDENTIFIER") {
+			string reg = get_free_reg();
+			file << "mov " << reg << "," << rreg << endl;
+			rreg = reg;
+		
+		}
+
 		
 		file << "cmp " << lreg << "," << rreg << endl;
 		
+		if(root->getRightChild()->getTToken() == "IDENTIFIER") free_reg(rreg);
+
+
 		string cmp_type;
 
 		if(root->getTValue() == ">") {
@@ -187,17 +230,16 @@ string compile(SyntaxTree* st) {
 	}		
 
 	else if(root->getTToken() == "IDENTIFIER") {
-		cout << var_counter << endl;
-		return " dword [esp+" + to_string(4*(var_counter - (symbol_table[root->getTValue()] + 1))) + "]";		
+		int pos = search_symtab(symbol_table, root->getTValue());
+		return " dword [esp+" + to_string(4*(var_counter - (pos + 1))) + "]";		
 	
 	}
 
 	else if(root->getTToken() == "ASSIGNMENT") {
-
 		string var_name = root->getLeftChild()->getTValue();
-		symbol_table.insert({var_name, var_counter});
+		symbol_table->table.insert({var_name, var_counter});
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
-		string res = compile(&right_tree);
+		string res = compile(&right_tree, symbol_table);
 		file << "push " << res << endl;
 		free_reg(res);
 		var_counter++;
@@ -208,16 +250,22 @@ string compile(SyntaxTree* st) {
 
 	else if(root->getTValue() == "if") {
 		within_scope++;
+		symtab* scope_table = new symtab;
+		scope_table->table = {};
 		jmp_flag = 1;
 		SyntaxTree cond_tree = SyntaxTree(root->getLeftChild());
-		string lbl = compile(&cond_tree);
+		string lbl = compile(&cond_tree, symbol_table);	
 		
 		for(int i = 0; i < st->get_child_trees().size(); i++) {
 			SyntaxTree* child = &(st->get_child_trees()[i]);
-			compile(child);
+			compile(child, scope_table);
 		
 		}
-		
+
+		file << "add esp," << scope_table->table.size() * 4 << endl;
+		var_counter -= scope_table->table.size();
+				
+		delete scope_table;
 		file << lbl  << ":\n";
 		
 		within_scope--;
@@ -226,13 +274,20 @@ string compile(SyntaxTree* st) {
 	}
 
 
-	else if(root->getTValue() == "printh") {
-		file << "call printh\n";
-		return "printh";
+	else if(root->getTToken() == "FCALL") {
+			
+		for(int i = st->get_function_parameters().size()-1; i > -1; i--) {
+			string param = compile(&(st->get_function_parameters()[i]), symbol_table);
+			file << "push " << param << endl;
+		}
+
+		file << "call " << root->getTValue() << endl;
+		file << "add esp," << st->get_function_parameters().size() * 4 << endl;
+		return root->getTValue();
+	
 	}
 
 
-	file << "jmp $";
 	
 	file.close();
 	return "";

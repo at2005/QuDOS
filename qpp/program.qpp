@@ -1,3 +1,5 @@
+
+
 int function add_one(int x) {
 	x += 1;
 	return x;
@@ -5,19 +7,19 @@ int function add_one(int x) {
 }
 
 
-function main() {	
-	if(10 > 2) {
+
+function main() {
+	int var =  10;	
+	int var2 = 14;
+
+	if(var2 > var) {
 		int a = 2 + 4;
 		int d = a + 5;
-		printh();	
+		printh(a+d);	
 	
 	}
 
-	int b = 3 + 9;
-	printh();
-	int c = b - 2;
-	printh();
-	
+		
 
 }
 

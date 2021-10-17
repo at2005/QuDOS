@@ -27,13 +27,17 @@ int main() {
 	Node* root = main_tree->getRoot();
 	
 	free_regs = {0,0,0,0,0,0};
-	file << "[extern printh]";
+	file << "[extern printh]\n";
 	file << "section .text:\nglobal main\nmain:\n";
 	
-
+	std::unordered_map<string,int> mtable = {};
+	symtab* main_table = new symtab;
+	main_table->table = mtable;
+	
+	
 
 	for(int i = 0; i < main_tree->get_child_trees().size(); i++) { 
-		compile(&(main_tree->get_child_trees()[i]));	
+		compile(&(main_tree->get_child_trees()[i]), main_table);	
 	}
 	
 	file << "add esp," << var_counter*4 << endl;	

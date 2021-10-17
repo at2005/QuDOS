@@ -1,27 +1,27 @@
-[extern printh]section .text:
+[extern printh]
+section .text:
 global main
 main:
 mov eax,10
-mov ebx,2
-cmp eax,ebx
+push eax
+mov eax,14
+push eax
+mov eax, dword [esp+4]
+cmp  dword [esp+0],eax
 jle l0
-mov ecx,2
-mov edx,4
-add ecx,edx
-push ecx
-mov ecx,5
-add  dword [esp+0],ecx
+mov eax,2
+mov ebx,4
+add eax,ebx
+push eax
+mov eax,5
+add  dword [esp+0],eax
 push  dword [esp+0]
+mov eax, dword [esp+0]
+add  dword [esp+4],eax
+push  dword [esp+4]
 call printh
+add esp,4
+add esp,8
 l0:
-mov ecx,3
-mov edx,9
-add ecx,edx
-push ecx
-call printh
-mov ecx,2
-sub  dword [esp+0],ecx
-push  dword [esp+0]
-call printh
-add esp,16
+add esp,8
 ret

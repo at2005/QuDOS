@@ -385,7 +385,7 @@ uint32_t fetch_vpage();
 uint32_t qcall_handler(sys_args qparams) {
 	if(qparams.eax == 0) {
 		
-		return (create_qproc()->qdata);
+		return (uint32_t)(create_qproc()->qdata);
 	
 	}	
 
@@ -518,9 +518,6 @@ void security_handler() {
 }
 
 
-/*uint32_t irq0_handler(registers regs,uint32_t flags,uint32_t ip,  uint32_t stack_ptr) {
-	return schedule(regs,flags,ip, stack_ptr);
-}*/
 
 void irq1_handler() {
 	keyboard_handle();

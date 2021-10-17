@@ -176,7 +176,7 @@ uint32_t kmmap(uint32_t addr) {
 
 uint32_t fetch_vpage() {
 	uint32_t* page_dir = getpd();
-	uint32_t page = get_page();
+	uint32_t page = (uint32_t)get_page();
 	uint32_t pd_offset = get_pde(page);
 	
 
