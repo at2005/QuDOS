@@ -13,11 +13,10 @@ mov eax,2
 mov ebx,4
 add eax,ebx
 push eax
-mov eax,5
-add  dword [esp+0],eax
-push  dword [esp+0]
-mov eax, dword [esp+0]
-add  dword [esp+4],eax
+mov eax,9
+mov ebx, dword [esp+0]
+add ebx,eax
+push ebx
 push  dword [esp+4]
 call printh
 add esp,4

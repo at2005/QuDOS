@@ -132,10 +132,10 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
 		
-		if(root->getRightChild()->getTToken() == "IDENTIFIER") {
+		if(root->getLeftChild()->getTToken() == "IDENTIFIER") {
 			string temp_reg = get_free_reg();
-			file << "mov " << temp_reg << "," << rreg << endl;
-			rreg = temp_reg;
+			file << "mov " << temp_reg << "," << lreg << endl;
+			lreg = temp_reg;
 
 		}
 

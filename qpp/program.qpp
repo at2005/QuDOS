@@ -14,8 +14,8 @@ function main() {
 
 	if(var2 > var) {
 		int a = 2 + 4;
-		int d = a + 5;
-		printh(a+d);	
+		int d = a+9;
+		printh(a);	
 	
 	}
 
