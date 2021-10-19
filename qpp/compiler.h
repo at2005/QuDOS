@@ -7,10 +7,14 @@
 static int jmp_flag = 0;
 static int counter = 0;
 static int var_counter = 0;
+static int string_counter = 0;
 static int within_scope = 0;
+
+string data_section = "section .data:\n";
 
 typedef struct symtab {
 	std::unordered_map<string, int> table;
+//	std::unordered_map<string, string> str_table;
 	struct symtab* parent_table; 
 
 } symtab;
@@ -139,6 +143,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 		}
 
+		
+
 
 		string op_type = "";
 		if(root->getTValue() == "+") op_type = "add ";
@@ -233,6 +239,31 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		int pos = search_symtab(symbol_table, root->getTValue());
 		return " dword [esp+" + to_string(4*(var_counter - (pos + 1))) + "]";		
 	
+	}
+
+	else if(root->getTToken() == "STRING") {
+		string str_label =  "s" + to_string(string_counter); 
+		data_section +=  str_label + " db \"";
+		string str_value = root->getTValue();
+	       	for(int i = 0; i < str_value.size(); i++) {
+			if(str_value[i] == '\\') {
+				data_section += "\",0xA,\"";
+				i++;
+			}
+		
+			
+			else {	
+				data_section += str_value[i];
+
+			
+			}
+
+		}
+	       
+		string_counter++;
+		data_section += "\",0\n";
+		return str_label;
+		
 	}
 
 	else if(root->getTToken() == "ASSIGNMENT") {

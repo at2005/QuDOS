@@ -9,8 +9,11 @@ using namespace std;
 
 
 int main() {
+
+	
 	vector<Pair> token_values = execute_lex("program.qpp").getLex().dict_output;
 	vector<vector<Pair>> expressions = getEachExpression(token_values);
+	
 	
 	
 	SyntaxTree* main_tree;
@@ -27,7 +30,7 @@ int main() {
 	Node* root = main_tree->getRoot();
 	
 	free_regs = {0,0,0,0,0,0};
-	file << "[extern printh]\n";
+	file << "[extern printh]\n[extern printf]\n";
 	file << "section .text:\nglobal main\nmain:\n";
 	
 	std::unordered_map<string,int> mtable = {};
@@ -41,7 +44,9 @@ int main() {
 	}
 	
 	file << "add esp," << var_counter*4 << endl;	
-	file << "ret";	
+	file << "ret\n";	
+
+	file << data_section;
 
 	return 0;
 

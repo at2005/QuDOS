@@ -12,6 +12,7 @@ private:
 public:
 
 	void lexer(std::string line) {
+		bool is_str = false;
 		string prev = "";
 		//proxy for storing data while not encountering any other series of chars
 		std::string proxy = "";
@@ -20,94 +21,117 @@ public:
 			//assign the first character to tempString
 			tempString = line[i];
 			// series of checks for lexing
-
-			//semicolon check
-			if (is_semicolon(tempString)) {
-				if (proxy != "") {
-					outputLex.add(proxy, getToken(proxy));
-
-				}
-				outputLex.add(tempString, getToken(tempString));
-				proxy = "";
-			}
-
-			//comment checks
-			else if (isComment(tempString)) {
-				break;
-			}
-
-			//operator checks
-			else if (isOperator(tempString) || isCompOp(tempString) || isAssignment(tempString)) {
-				char nextStr;
-				if (line.size() > i + 1) {
-					nextStr = line[i + 1];
-				}
-
-				else {
-					nextStr = '\0'; 
-				}
-				//checks for double operators, e.g. <=, ==, ++, etc.
-				if (isCompOp(tempString + nextStr) || isOperator(tempString + nextStr)) {
-					if (proxy != "") {
-
-						outputLex.add(proxy, getToken(proxy));
-
-					}
-					outputLex.add(tempString+nextStr, getToken(tempString+nextStr));
+			
+			if(tempString == "\"") {
+				if(is_str) {
+					outputLex.add(proxy, "STRING");
 					proxy = "";
-					i++;
+				
 				}
 
-				else {
+				is_str = !is_str;
+			
+			}
 
+			else if(!is_str) {
+				//semicolon check
+				if (is_semicolon(tempString)) {
 					if (proxy != "") {
-
 						outputLex.add(proxy, getToken(proxy));
 
 					}
 					outputLex.add(tempString, getToken(tempString));
 					proxy = "";
 				}
-			}
 
-
-			//checks if bracket or seperator
-			else if (isBracket(tempString) || isSeperator(tempString)) {
-				if (proxy != "") {
-					outputLex.add(proxy, getToken(proxy));
-
+				//comment checks
+				else if (isComment(tempString)) {
+					break;
 				}
 
-				outputLex.add(tempString, getToken(tempString));
-				proxy = "";
+				//operator checks
+				else if (isOperator(tempString) || isCompOp(tempString) || isAssignment(tempString)) {
+					char nextStr;
+					if (line.size() > i + 1) {
+						nextStr = line[i + 1];
+					}
 
-			}
-			// space and tab checks
-			else if (tempString == " " || line[i] == '\t') {
-				if (proxy != "") {
+					else {
+						nextStr = '\0'; 
+					}
+					//checks for double operators, e.g. <=, ==, ++, etc.
+					if (isCompOp(tempString + nextStr) || isOperator(tempString + nextStr)) {
+						if (proxy != "") {
 
-					outputLex.add(proxy, getToken(proxy));
+							outputLex.add(proxy, getToken(proxy));
+
+						}
+						outputLex.add(tempString+nextStr, getToken(tempString+nextStr));
+						proxy = "";
+						i++;
+					}
+
+					else {
+
+						if (proxy != "") {
+
+							outputLex.add(proxy, getToken(proxy));
+
+						}
+						outputLex.add(tempString, getToken(tempString));
+						proxy = "";
+					}
+				}
+
+
+				//checks if bracket or seperator
+				else if (isBracket(tempString) || isSeperator(tempString)) {
+					if (proxy != "") {
+						outputLex.add(proxy, getToken(proxy));
+
+					}
+
+					outputLex.add(tempString, getToken(tempString));
 					proxy = "";
+
 				}
+				// space and tab checks
+				else if (tempString == " " || line[i] == '\t') {
+					if (proxy != "") {
+
+						outputLex.add(proxy, getToken(proxy));
+						proxy = "";
+					}
+				}
+			
+
+				//checks for strings
+				else {
+					if (tempString != " ") {
+						proxy += tempString;
+						
+					}
+				}
+
+				tempString = "";
+
+
 			}
 
-			//checks for strings
 			else {
-				if (tempString != " ") {
-					proxy += tempString;
-				}
+				proxy += tempString;	
+
 			}
-
-			tempString = "";
-
-
+		
+		
+	
 		}
 
 
 	}
 	
 	//gets lexed output 
-	const Dict getLex() {
+	Dict getLex() {
 		return outputLex;
 	}
 

@@ -17,18 +17,18 @@ Lex execute_lex(string src_file) {
 	string nameOfFile = src_file;
 
 	
-		target_file = "program.qasm";
 		target_system = "IBM";
 
-		//nameOfFile += ".q";
 		ifstream FileIn(nameOfFile);
 		std::string line;
 
 		if (FileIn.is_open()) {
 			while (getline(FileIn, line)) {
 				lx.lexer(line);
+
 			}
 
+//			lx.getLex().printLex();
 			return lx;
 		}
 
