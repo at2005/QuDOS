@@ -6,9 +6,11 @@ function main() {
 
 	if(var2 > var) {	
 		printf("Hello world");
-		
+		int a = 4;	
+	
 	}
-
+		
+	printf("hello");
 }
 
 

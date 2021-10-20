@@ -33,6 +33,7 @@ int search_symtab(symtab* tab, string var_name) {
 	if(tab->table.find(var_name) != tab->table.end()) {
 		return tab->table.find(var_name)->second;
 
+	
 	}
 
 	return search_symtab(tab->parent_table, var_name);
@@ -135,7 +136,8 @@ void mov_x86(string l_op, string r_op) {
 string compile(SyntaxTree* st, symtab* symbol_table ) {
 	// get root node of tree
 	Node* root = st->getRoot();
-		
+	
+	cout << root->getTValue();
 	// check if root is an operator
 	if(root->getTToken() == "OPERATOR") {
 	       // generate syntax trees for left and right children
@@ -176,6 +178,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 
 	else if(root->getTToken() == "COMPARISON_OPERATOR") {
+
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 
@@ -300,12 +303,17 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		within_scope++;
 		symtab* scope_table = new symtab;
 		scope_table->table = {};
+		scope_table->parent_table = symbol_table;
 		jmp_flag = 1;
-		SyntaxTree cond_tree = SyntaxTree(root->getLeftChild());
-		string lbl = compile(&cond_tree, symbol_table);	
-		
+		SyntaxTree cond_tree(root->getLeftChild());
+		string lbl =  compile(&cond_tree, symbol_table);
+			
+			
 		for(int i = 0; i < st->get_child_trees().size(); i++) {
+
 			SyntaxTree* child = &(st->get_child_trees()[i]);
+				
+	//		cout << child->getRoot()->getTValue();	
 			compile(child, scope_table);
 		
 		}
@@ -313,8 +321,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		file << "add esp," << scope_table->table.size() * 4 << endl;
 		var_counter -= scope_table->table.size();
 				
-		delete scope_table;
-		file << lbl  << ":\n";
+		//delete scope_table;
+//		file << lbl  << ":\n";
 		
 		within_scope--;
 		return "";	
@@ -324,7 +332,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	else if(root->getTToken() == "FCALL") {
 			
-		for(int i = st->get_function_parameters().size()-1; i > -1; i--) {
+		for(int i = st->get_function_parameters().size()-1; i > -1;  i--) {
 			string param = compile(&(st->get_function_parameters()[i]), symbol_table);
 			file << "push " << param << endl;
 		}

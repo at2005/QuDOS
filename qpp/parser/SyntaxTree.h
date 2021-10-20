@@ -315,8 +315,8 @@ private:
 		
 		vector<vector<Pair>> separated_values = returnSep(parse_between("(", ")", inputExpr));
 	
-
 		for (int i = 0; i < separated_values.size(); i++) {
+			
 			SyntaxTree st =  SyntaxTree(separated_values[i]);
 			this->function_parameters.push_back(st);
 		}

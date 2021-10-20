@@ -13,8 +13,7 @@ int main() {
 	
 	vector<Pair> token_values = execute_lex("program.qpp").getLex().dict_output;
 	vector<vector<Pair>> expressions = getEachExpression(token_values);
-
-	execute_lex("program.qpp").getLex().printLex();	
+	
 	
 	
 	SyntaxTree* main_tree;
@@ -28,18 +27,18 @@ int main() {
 	
 	}
 
-	
+	cout << main_tree->get_child_trees()[0].get_child_trees()[0].get_function_parameters()[0].getRoot()->getTValue();
+
 	Node* root = main_tree->getRoot();
 	
 	free_regs = {0,0,0,0,0,0};
 	file << "[extern printh]\n[extern printf]\n";
 	file << "section .text:\nglobal main\nmain:\n";
 	
-
-	
 	std::unordered_map<string,int> mtable = {};
 	symtab* main_table = new symtab;
 	main_table->table = mtable;
+	
 	
 
 	for(int i = 0; i < main_tree->get_child_trees().size(); i++) { 
