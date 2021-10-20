@@ -3,6 +3,12 @@
 #include "parser/SyntaxTree.h"
 #include <fstream>
 
+#define ADD_X86 "add "
+#define SUB_X86 "sub "
+#define MUL_X86 "imul "
+#define DIV_X86 "div "
+
+
 // create global variables
 static int jmp_flag = 0;
 static int counter = 0;
@@ -12,28 +18,25 @@ static int within_scope = 0;
 
 string data_section = "section .data:\n";
 
+// structure for symbol table
 typedef struct symtab {
+	// hash table for variable names -> position 
 	std::unordered_map<string, int> table;
-//	std::unordered_map<string, string> str_table;
+	// pointer to a parent symbol table
 	struct symtab* parent_table; 
 
 } symtab;
 
+
 // recursive search the symbol table
 int search_symtab(symtab* tab, string var_name) {
-	
-	
 	if(tab->table.find(var_name) != tab->table.end()) {
 		return tab->table.find(var_name)->second;
 
 	}
 
-
 	return search_symtab(tab->parent_table, var_name);
 	
-
-
-
 }
 
 
@@ -112,47 +115,61 @@ string get_word_reg(string reg) {
 
 // split a 32-bit register into its 8-bit counterpart
 string get_byte_reg(string reg) {
-	if(reg == "ecx") return "cl";
+	if(reg == "eax") return "al";
+	else if(reg == "ebx") return "bl";
+	else if(reg == "ecx") return "cl";
+	else if(reg == "edx") return "dl";
 	return "";
 }
 
 
-
-void write_reg(int a) {}
-int lookup() {return 0;}
-
-
 static ofstream file("./out.asm");
 
+void mov_x86(string l_op, string r_op) {
+	file << "mov " << l_op  << "," << r_op << endl;
+
+}
+
+
+// compiler function
 string compile(SyntaxTree* st, symtab* symbol_table ) {
-
+	// get root node of tree
 	Node* root = st->getRoot();
-	
-
-	if(root->getTToken() == "OPERATOR") { 
+		
+	// check if root is an operator
+	if(root->getTToken() == "OPERATOR") {
+	       // generate syntax trees for left and right children
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 
+		// call compiler recursively on each syntax tree
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
 		
+		// if the left child is an identifier
 		if(root->getLeftChild()->getTToken() == "IDENTIFIER") {
+			// get a free register
 			string temp_reg = get_free_reg();
-			file << "mov " << temp_reg << "," << lreg << endl;
+			// mov the left operand into a register for processing
+			mov_x86(temp_reg, lreg);
+			// set the left value to the register
 			lreg = temp_reg;
 
 		}
 
 		
 
-
+		// set operation type to instruction
 		string op_type = "";
-		if(root->getTValue() == "+") op_type = "add ";
-		else if(root->getTValue() == "-") op_type = "sub ";
-		else if (root->getTValue() == "*") op_type = "imul ";
-		else if(root->getTValue() == "/") op_type = "idiv ";	
+		if(root->getTValue() == "+") op_type = ADD_X86;
+		else if(root->getTValue() == "-") op_type = SUB_X86;
+		else if (root->getTValue() == "*") op_type = MUL_X86;
+		else if(root->getTValue() == "/") op_type = DIV_X86;	
 		file << op_type  << lreg << "," << rreg << endl;
+		
+		free_reg(lreg);
 		free_reg(rreg);
+		
 	
 		return lreg;
 	}

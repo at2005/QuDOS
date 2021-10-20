@@ -3,10 +3,10 @@
 section .text:
 global main
 main:
-push s0
-call printf
-add esp,4
-add esp,0
-ret
-section .data:
-s0 db "Hello world",0
+mov eax,10
+push eax
+mov eax,14
+push eax
+mov eax, dword [esp+4]
+cmp  dword [esp+0],eax
+jle l0
