@@ -306,14 +306,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 
 	else if(root->getTToken() == "FCALL") {
-			
-		for(int i = st->get_function_parameters().size()-1; i > -1; i--) {
-			string param = compile(&(st->get_function_parameters()[i]), symbol_table);
+		
+		vector<SyntaxTree> func_params = st->get_function_parameters();	
+		for(int i = func_params.size()-1; i > -1; i--) {
+			string param = compile(&(func_params[i]), symbol_table);
 			file << "push " << param << endl;
 		}
 
 		file << "call " << root->getTValue() << endl;
-		file << "add esp," << st->get_function_parameters().size() * 4 << endl;
+		file << "add esp," << func_params.size() * 4 << endl;
 		return root->getTValue();
 	
 	}
