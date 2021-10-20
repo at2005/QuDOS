@@ -3,12 +3,6 @@
 #include "parser/SyntaxTree.h"
 #include <fstream>
 
-#define ADD_X86 "add "
-#define SUB_X86 "sub "
-#define MUL_X86 "imul "
-#define DIV_X86 "div "
-
-
 // create global variables
 static int jmp_flag = 0;
 static int counter = 0;
@@ -18,26 +12,28 @@ static int within_scope = 0;
 
 string data_section = "section .data:\n";
 
-// structure for symbol table
 typedef struct symtab {
-	// hash table for variable names -> position 
 	std::unordered_map<string, int> table;
-	// pointer to a parent symbol table
+//	std::unordered_map<string, string> str_table;
 	struct symtab* parent_table; 
 
 } symtab;
 
-
 // recursive search the symbol table
 int search_symtab(symtab* tab, string var_name) {
+	
+	
 	if(tab->table.find(var_name) != tab->table.end()) {
 		return tab->table.find(var_name)->second;
 
-	
 	}
+
 
 	return search_symtab(tab->parent_table, var_name);
 	
+
+
+
 }
 
 
@@ -116,69 +112,53 @@ string get_word_reg(string reg) {
 
 // split a 32-bit register into its 8-bit counterpart
 string get_byte_reg(string reg) {
-	if(reg == "eax") return "al";
-	else if(reg == "ebx") return "bl";
-	else if(reg == "ecx") return "cl";
-	else if(reg == "edx") return "dl";
+	if(reg == "ecx") return "cl";
 	return "";
 }
 
 
+
+void write_reg(int a) {}
+int lookup() {return 0;}
+
+
 static ofstream file("./out.asm");
 
-void mov_x86(string l_op, string r_op) {
-	file << "mov " << l_op  << "," << r_op << endl;
-
-}
-
-
-// compiler function
 string compile(SyntaxTree* st, symtab* symbol_table ) {
-	// get root node of tree
+
 	Node* root = st->getRoot();
 	
-	cout << root->getTValue();
-	// check if root is an operator
-	if(root->getTToken() == "OPERATOR") {
-	       // generate syntax trees for left and right children
+
+	if(root->getTToken() == "OPERATOR") { 
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 
-		// call compiler recursively on each syntax tree
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
 		
-		// if the left child is an identifier
 		if(root->getLeftChild()->getTToken() == "IDENTIFIER") {
-			// get a free register
 			string temp_reg = get_free_reg();
-			// mov the left operand into a register for processing
-			mov_x86(temp_reg, lreg);
-			// set the left value to the register
+			file << "mov " << temp_reg << "," << lreg << endl;
 			lreg = temp_reg;
 
 		}
 
 		
 
-		// set operation type to instruction
+
 		string op_type = "";
-		if(root->getTValue() == "+") op_type = ADD_X86;
-		else if(root->getTValue() == "-") op_type = SUB_X86;
-		else if (root->getTValue() == "*") op_type = MUL_X86;
-		else if(root->getTValue() == "/") op_type = DIV_X86;	
+		if(root->getTValue() == "+") op_type = "add ";
+		else if(root->getTValue() == "-") op_type = "sub ";
+		else if (root->getTValue() == "*") op_type = "imul ";
+		else if(root->getTValue() == "/") op_type = "idiv ";	
 		file << op_type  << lreg << "," << rreg << endl;
-		
-		free_reg(lreg);
 		free_reg(rreg);
-		
 	
 		return lreg;
 	}
 
 
 	else if(root->getTToken() == "COMPARISON_OPERATOR") {
-
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 
@@ -303,17 +283,12 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		within_scope++;
 		symtab* scope_table = new symtab;
 		scope_table->table = {};
-		scope_table->parent_table = symbol_table;
 		jmp_flag = 1;
-		SyntaxTree cond_tree(root->getLeftChild());
-		string lbl =  compile(&cond_tree, symbol_table);
-			
-			
+		SyntaxTree cond_tree = SyntaxTree(root->getLeftChild());
+		string lbl = compile(&cond_tree, symbol_table);	
+		
 		for(int i = 0; i < st->get_child_trees().size(); i++) {
-
 			SyntaxTree* child = &(st->get_child_trees()[i]);
-				
-	//		cout << child->getRoot()->getTValue();	
 			compile(child, scope_table);
 		
 		}
@@ -321,8 +296,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		file << "add esp," << scope_table->table.size() * 4 << endl;
 		var_counter -= scope_table->table.size();
 				
-		//delete scope_table;
-//		file << lbl  << ":\n";
+		delete scope_table;
+		file << lbl  << ":\n";
 		
 		within_scope--;
 		return "";	
@@ -331,14 +306,14 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 
 	else if(root->getTToken() == "FCALL") {
-			
-		for(int i = st->get_function_parameters().size()-1; i > -1;  i--) {
-			string param = compile(&(st->get_function_parameters()[i]), symbol_table);
+		vector<SyntaxTree> func_params = st->get_function_parameters();		
+		for(int i = func_params.size()-1; i > -1; i--) {
+			string param = compile(&(func_params[i]), symbol_table);
 			file << "push " << param << endl;
 		}
 
 		file << "call " << root->getTValue() << endl;
-		file << "add esp," << st->get_function_parameters().size() * 4 << endl;
+		file << "add esp," << func_params.size() * 4 << endl;
 		return root->getTValue();
 	
 	}

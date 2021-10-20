@@ -3,14 +3,16 @@
 function main() {
 	int var =  10;	
 	int var2 = 14;
-
-	if(var2 > var) {	
-		printf("Hello world");
-		int a = 4;	
 	
+	if(var2 > var) {
+		printf("Hello world\n");
+		printh(4);
+		printf("Ok... This is cool though!");
+		printh(120);
 	}
-		
-	printf("hello");
+
+	printf("Done");
+
 }
 
 
