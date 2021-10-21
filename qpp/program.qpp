@@ -1,14 +1,16 @@
 
 
 function main() {
-
-	if(4 > 2) {
-		printf(2);	
-		
+	int var = 12;
+	int var2 = 4;	
+	if(var > var2) {
+		for(int i = 0, i < 10, i += 1) {
+			if(i > 5) {
+				printf("Hello world\n");
+			}
+		}
+	
 	}
-
-	printf("Hello world");
-
 
 }
 

@@ -130,13 +130,16 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	
 
 	if(root->getTToken() == "OPERATOR") { 
+
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
+
 		
-		if(root->getLeftChild()->getTToken() == "IDENTIFIER") {
+
+		if(root->getLeftChild()->getTToken() == "IDENTIFIER" && !isAppendOperator(root->getTValue())) {
 			string temp_reg = get_free_reg();
 			file << "mov " << temp_reg << "," << lreg << endl;
 			lreg = temp_reg;
@@ -145,17 +148,20 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 		
 
-
+			
 		string op_type = "";
-		if(root->getTValue() == "+") op_type = "add ";
-		else if(root->getTValue() == "-") op_type = "sub ";
-		else if (root->getTValue() == "*") op_type = "imul ";
+		if(root->getTValue() == "+" || root->getTValue() == "+=") op_type = "add ";
+		else if(root->getTValue() == "-" || root->getTValue() == "-=") op_type = "sub ";
+		else if (root->getTValue() == "*" || root->getTValue() == "*=") op_type = "imul ";
 		else if(root->getTValue() == "/") op_type = "idiv ";	
 		file << op_type  << lreg << "," << rreg << endl;
+		
 		free_reg(rreg);
-	
+
 		return lreg;
 	}
+
+
 
 
 	else if(root->getTToken() == "COMPARISON_OPERATOR") {
@@ -219,7 +225,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 		
 
-		
+		free_reg(lreg);
+		free_reg(rreg);	
 		string label = "l" + to_string(counter);	
 		counter++;
 		file << cmp_type << label << endl;
@@ -230,9 +237,9 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	else if(root->getTToken() == "NUMBER") {
 		string val = root->getTValue();
-		string free_reg = get_free_reg();
-		file << "mov " << free_reg << "," << val << endl;
-		return free_reg;
+		string freg = get_free_reg();
+		file << "mov " << freg << "," << val << endl;
+		return freg;
 	}		
 
 	else if(root->getTToken() == "IDENTIFIER") {
@@ -311,11 +318,41 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
 			file << "push " << param << endl;
+			free_reg(param);
 		}
 
 		file << "call " << root->getTValue() << endl;
 		file << "add esp," << func_params.size() * 4 << endl;
 		return root->getTValue();
+	
+	}
+
+
+	else if(root->getTValue() == "for") {
+	
+		vector<SyntaxTree> func_params = st->get_function_parameters();
+		compile(&(func_params[0]), symbol_table);
+		string jmp_label =  "l" + to_string(counter);
+		file << jmp_label << ":\n";
+	       	counter++;
+		
+		jmp_flag = 1;
+		string break_label = compile(&(func_params[1]), symbol_table);
+		
+		vector<SyntaxTree> child_trees = st->get_child_trees();
+
+		for(int i = 0; i < child_trees.size(); i++) {
+			compile(&(child_trees[i]),symbol_table);
+		
+		}
+
+		compile(&(func_params[2]), symbol_table);
+			
+		file << "jmp " << jmp_label << endl;
+		
+		file << break_label << ":\n";	
+			
+		return break_label;		
 	
 	}
 
