@@ -37,7 +37,7 @@ int main() {
 	symtab* main_table = new symtab;
 	main_table->table = mtable;
 	
-	
+	main_table->parent_table = nullptr;	
 
 	for(int i = 0; i < main_tree->get_child_trees().size(); i++) { 
 		compile(&(main_tree->get_child_trees()[i]), main_table);	

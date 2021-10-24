@@ -3,18 +3,44 @@
 #include "parser/SyntaxTree.h"
 #include <fstream>
 
-// create global variables
-static int jmp_flag = 0;
-static int counter = 0;
-static int var_counter = 0;
-static int string_counter = 0;
-static int within_scope = 0;
+#define ADD_X86 "add"
+#define SUB_X86 "sub"
+#define MUL_X86 "imul"
+#define DIV_X86 "div"
 
+#define JE_X86 "je"
+#define JNE_X86 "jne"
+#define JG_X86 "jg"
+#define JGE_X86 "jge"
+#define JL_X86 "jl"
+#define JLE_X86 "jle"
+
+#define SETE_X86 "sete"
+#define SETNE_X86 "setne"
+#define SETG_X86 "setg"
+#define SETGE_X86 "setge"
+#define SETL_X86 "setl"
+#define SETLE_X86 "setle"
+
+
+// create global variables
+// jmp_flag is set during compilation of test condition
+static int jmp_flag = 0;
+// label counter
+static int counter = 0;
+// variable counter
+static int var_counter = 0;
+// count number of strings
+static int string_counter = 0;
+
+// file descriptor for output
+static ofstream file("./out.asm");
+// string corresponding to data section of file
 string data_section = "section .data:\n";
 
+// structure for symbol table
 typedef struct symtab {
 	std::unordered_map<string, int> table;
-//	std::unordered_map<string, string> str_table;
 	struct symtab* parent_table; 
 
 } symtab;
@@ -22,7 +48,11 @@ typedef struct symtab {
 // recursive search the symbol table
 int search_symtab(symtab* tab, string var_name) {
 	
-	
+	if(tab == nullptr) {
+		cerr << "VARIABLE " << var_name << " NOT DECLARED OR NOT IN SCOPE!\n";
+	       	exit(1);
+	}
+
 	if(tab->table.find(var_name) != tab->table.end()) {
 		return tab->table.find(var_name)->second;
 
@@ -112,33 +142,31 @@ string get_word_reg(string reg) {
 
 // split a 32-bit register into its 8-bit counterpart
 string get_byte_reg(string reg) {
-	if(reg == "ecx") return "cl";
+	if(reg == "eax") return "al";
+	else if(reg == "ebx") return "bl";
+	else if(reg == "ecx") return "cl";
+	else if(reg == "edx") return "dl";
 	return "";
 }
 
 
 
-void write_reg(int a) {}
-int lookup() {return 0;}
-
-
-static ofstream file("./out.asm");
-
 string compile(SyntaxTree* st, symtab* symbol_table ) {
-
+	// get root of AST
 	Node* root = st->getRoot();
 	
-
+	// if operator
 	if(root->getTToken() == "OPERATOR") { 
 
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
-
+		
+		// compile children
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
 
 		
-
+		// if the left child is an identifier move it into a register
 		if(root->getLeftChild()->getTToken() == "IDENTIFIER" && !isAppendOperator(root->getTValue())) {
 			string temp_reg = get_free_reg();
 			file << "mov " << temp_reg << "," << lreg << endl;
@@ -148,13 +176,13 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 		
 
-			
+		// set operation type based on instruction
 		string op_type = "";
-		if(root->getTValue() == "+" || root->getTValue() == "+=") op_type = "add ";
-		else if(root->getTValue() == "-" || root->getTValue() == "-=") op_type = "sub ";
-		else if (root->getTValue() == "*" || root->getTValue() == "*=") op_type = "imul ";
-		else if(root->getTValue() == "/") op_type = "idiv ";	
-		file << op_type  << lreg << "," << rreg << endl;
+		if(root->getTValue() == "+" || root->getTValue() == "+=") op_type = ADD_X86;
+		else if(root->getTValue() == "-" || root->getTValue() == "-=") op_type = SUB_X86;
+		else if (root->getTValue() == "*" || root->getTValue() == "*=") op_type = MUL_X86;
+		else if(root->getTValue() == "/") op_type = DIV_X86;	
+		file << op_type << " " << lreg << "," << rreg << endl;
 		
 		free_reg(rreg);
 
@@ -162,7 +190,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	}
 
 
-
+	// case if tree corresponds to a relational operation
 
 	else if(root->getTToken() == "COMPARISON_OPERATOR") {
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
@@ -171,56 +199,61 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
 		
-		if(root->getRightChild()->getTToken() == "IDENTIFIER") {
+		// move into register if left operand is an identifier
+		if(root->getLeftChild()->getTToken() == "IDENTIFIER") {
 			string reg = get_free_reg();
-			file << "mov " << reg << "," << rreg << endl;
-			rreg = reg;
+			file << "mov " << reg << "," << lreg << endl;
+			lreg = reg;
 		
 		}
 
-		
+		// compare operands
 		file << "cmp " << lreg << "," << rreg << endl;
 		
-		if(root->getRightChild()->getTToken() == "IDENTIFIER") free_reg(rreg);
+		
+		// free left register
+		if(root->getLeftChild()->getTToken() == "IDENTIFIER") free_reg(rreg);
 
-
-		string cmp_type;
-
+		
+		string cmp_type = "";
+		
+		// set cmp_type to either a set or a jump. Latter is useful
+		// for conds/loops and former for using result in another operation
 		if(root->getTValue() == ">") {
-			if(!jmp_flag) cmp_type = "setg "; 
-			else cmp_type = "jle ";
+			if(!jmp_flag) cmp_type = SETG_X86; 
+			else cmp_type = JLE_X86;
 		}
 		
 		else if(root->getTValue() == ">=") {
-			if(!jmp_flag) cmp_type = "setge ";
-		       	else cmp_type = "jl ";
+			if(!jmp_flag) cmp_type = SETGE_X86;
+		       	else cmp_type = JL_X86;
 		}
 
 		else if(root->getTValue() == "<") {
-			if(!jmp_flag) cmp_type = "setl ";
-		       	else cmp_type = "jge ";
+			if(!jmp_flag) cmp_type = SETL_X86;
+		       	else cmp_type = JGE_X86;
 		}
 
 		else if(root->getTValue() == "<=") {
-			if(!jmp_flag) cmp_type = "setle ";
-		       	else cmp_type = "jg ";
+			if(!jmp_flag) cmp_type = SETLE_X86;
+		       	else cmp_type = JG_X86;
 		}
 
 		else if(root->getTValue() == "==") {
-			if(!jmp_flag) cmp_type = "sete ";
-		       	else cmp_type = "jne ";
+			if(!jmp_flag) cmp_type = SETE_X86;
+		       	else cmp_type = JNE_X86;
 		}
 
 		else if(root->getTValue() == "!=") {
-		       	if(!jmp_flag) cmp_type = "setne ";
-		       	else cmp_type = "je ";
+		       	if(!jmp_flag) cmp_type = SETNE_X86;
+		       	else cmp_type = JE_X86;
 		}
 		
 		if(!jmp_flag) {
 			string reg = get_free_reg();
 			string byte_reg = get_byte_reg(reg);
 			file << "and " << reg << "," << "0x0" << endl;	
-			file << cmp_type << byte_reg << endl;
+			file << cmp_type << " " << byte_reg << endl;
 			return reg;	
 		}
 		
@@ -229,7 +262,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		free_reg(rreg);	
 		string label = "l" + to_string(counter);	
 		counter++;
-		file << cmp_type << label << endl;
+		file << cmp_type << " " << label << endl;
 		return label;			
 	
 	}	
@@ -287,15 +320,18 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 
 	else if(root->getTValue() == "if") {
-		within_scope++;
 		symtab* scope_table = new symtab;
 		scope_table->table = {};
+		scope_table->parent_table = symbol_table;
+	
 		jmp_flag = 1;
 		SyntaxTree cond_tree = SyntaxTree(root->getLeftChild());
 		string lbl = compile(&cond_tree, symbol_table);	
-		
-		for(int i = 0; i < st->get_child_trees().size(); i++) {
-			SyntaxTree* child = &(st->get_child_trees()[i]);
+	
+		vector<SyntaxTree> child_trees = st->get_child_trees();
+
+		for(int i = 0; i < child_trees.size(); i++) {
+			SyntaxTree* child = &(child_trees[i]);
 			compile(child, scope_table);
 		
 		}
@@ -306,7 +342,6 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		delete scope_table;
 		file << lbl  << ":\n";
 		
-		within_scope--;
 		return "";	
 			
 	}
