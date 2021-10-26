@@ -1,7 +1,5 @@
 
-#include "general/read.h"
-//#include "lexer/Lexer.h"
-#include "parser/SyntaxTree.h"
+
 #include "compiler.h"
 
 

@@ -1,3 +1,5 @@
+#ifndef LEXER_H
+#define LEXER_H
 
 #include "Tokens.h"
 #include "dictionary.h"
@@ -139,4 +141,4 @@ public:
 };
 
 
-
+#endif

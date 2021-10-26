@@ -11,7 +11,7 @@ function main() {
 	int var2 = 4;	
 	if(var > var2) {
 		for(int i = 1, i < 12, i+=2) {
-			
+			printh(var);	
 			printf("Iter: ");
 			printh(i);
 			
@@ -32,11 +32,16 @@ function main() {
 		
 		}
 
-
+	
 	
 	}
 
 	printh(var);
+
+
+	while(2 == 2) {
+		printh(2);
+	}
 
 }
 

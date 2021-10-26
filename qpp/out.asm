@@ -17,6 +17,9 @@ mov eax,12
 mov ebx, dword [esp+0]
 cmp ebx,eax
 jge l2
+push  dword [esp+8]
+call printh
+add esp,4
 push s0
 call printf
 add esp,4
@@ -59,6 +62,17 @@ l0:
 push  dword [esp+4]
 call printh
 add esp,4
+l6:
+mov eax,2
+mov ebx,2
+cmp eax,ebx
+jne l7
+mov eax,2
+push eax
+call printh
+add esp,4
+jmp l6
+l7:
 add esp,8
 ret
 section .data:

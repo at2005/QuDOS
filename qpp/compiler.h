@@ -1,7 +1,11 @@
-#include <stddef.h>
+#ifndef COMPILER_H
+#define COMPILER_H
 
+#include <stddef.h>
+#include <unordered_map>
 #include "parser/SyntaxTree.h"
 #include <fstream>
+#include "general/read.h"
 
 #define ADD_X86 "add"
 #define SUB_X86 "sub"
@@ -45,6 +49,19 @@ typedef struct symtab {
 
 } symtab;
 
+
+// holds the status of each register
+static struct  {
+	uint32_t eax;
+	uint32_t ebx;
+	uint32_t ecx;
+	uint32_t edx;
+	uint32_t esi;
+	uint32_t edi;
+
+} free_regs;
+
+
 // recursive search the symbol table
 int search_symtab(symtab* tab, string var_name) {
 	
@@ -66,17 +83,6 @@ int search_symtab(symtab* tab, string var_name) {
 
 }
 
-
-// holds the status of each register
-static struct  {
-	uint32_t eax;
-	uint32_t ebx;
-	uint32_t ecx;
-	uint32_t edx;
-	uint32_t esi;
-	uint32_t edi;
-
-} free_regs;
 
 // method to check whether reg is free and return if so
 string get_free_reg() {
@@ -364,7 +370,10 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 
 	else if(root->getTValue() == "for") {
-	
+		
+		symtab* loop_scope = new symtab;
+		loop_scope->table = {};
+		loop_scope->parent_table = symbol_table;	
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		compile(&(func_params[0]), symbol_table);
 		string jmp_label =  "l" + to_string(counter);
@@ -377,7 +386,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		vector<SyntaxTree> child_trees = st->get_child_trees();
 
 		for(int i = 0; i < child_trees.size(); i++) {
-			compile(&(child_trees[i]),symbol_table);
+			compile(&(child_trees[i]),loop_scope);
 		
 		}
 
@@ -386,13 +395,45 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		file << "jmp " << jmp_label << endl;
 		
 		file << break_label << ":\n";	
-			
+		delete loop_scope;
 		return break_label;		
 	
 	}
 
 
+	else if(root->getTValue() == "while") {
+		
+		symtab* loop_scope = new symtab;
+		loop_scope->parent_table = symbol_table;
+		loop_scope->table = {};
+		vector<SyntaxTree> func_params = st->get_function_parameters();
+		cout << func_params.size();
+		jmp_flag = 1;
+		string jmp_label = "l" + to_string(counter);
+		counter++;
+	       	file << jmp_label << ":" << endl;	
+		SyntaxTree cond_tree = SyntaxTree(root->getLeftChild());
+		string break_label = compile(&cond_tree, symbol_table);
+		vector<SyntaxTree> child_trees = st->get_child_trees();
+
+		for(int i = 0; i < child_trees.size(); i++) {
+			compile(&(child_trees[i]),loop_scope);
+		
+		}
+		
+		file << "jmp " << jmp_label << endl;
+		
+		file << break_label << ":\n";
+		
+		delete loop_scope;
+		return break_label;
+
 	
-	file.close();
+	
+	}
+	
 	return "";
 }
+
+
+#endif

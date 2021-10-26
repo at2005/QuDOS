@@ -7,5 +7,5 @@ out: qpp
 	
 
 qpp:
-	g++ -m32  main.cpp -o qpp
+	g++ -m32 main.cpp -o qpp
 	
