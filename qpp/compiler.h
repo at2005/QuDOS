@@ -12,6 +12,7 @@
 #define MUL_X86 "imul"
 #define DIV_X86 "div"
 
+#define JMP_X86 "jmp"
 #define JE_X86 "je"
 #define JNE_X86 "jne"
 #define JG_X86 "jg"
@@ -19,12 +20,18 @@
 #define JL_X86 "jl"
 #define JLE_X86 "jle"
 
+#define CALL_X86 "call"
+#define RET_X86 "ret"
+
 #define SETE_X86 "sete"
 #define SETNE_X86 "setne"
 #define SETG_X86 "setg"
 #define SETGE_X86 "setge"
 #define SETL_X86 "setl"
 #define SETLE_X86 "setle"
+
+#define MOV_X86 "mov"
+#define CMP_X86 "cmp"
 
 
 // create global variables
@@ -156,6 +163,24 @@ string get_byte_reg(string reg) {
 }
 
 
+void mov_x86(string reg0, string reg1) {
+	file << MOV_X86 << " " << reg0 << "," << reg1 << endl;
+
+}
+
+
+void cmp_x86(string reg0, string reg1) {
+	file << CMP_X86 << " " << reg0 << "," << reg1 << endl;
+
+}
+
+
+void inc_esp_x86(unsigned int size) {
+	file << "add esp," << size << endl;
+
+}
+
+
 
 string compile(SyntaxTree* st, symtab* symbol_table ) {
 	// get root of AST
@@ -175,7 +200,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		// if the left child is an identifier move it into a register
 		if(root->getLeftChild()->getTToken() == "IDENTIFIER" && !isAppendOperator(root->getTValue())) {
 			string temp_reg = get_free_reg();
-			file << "mov " << temp_reg << "," << lreg << endl;
+			mov_x86(temp_reg, lreg);
 			lreg = temp_reg;
 
 		}
@@ -208,14 +233,13 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		// move into register if left operand is an identifier
 		if(root->getLeftChild()->getTToken() == "IDENTIFIER") {
 			string reg = get_free_reg();
-			file << "mov " << reg << "," << lreg << endl;
+			mov_x86(reg, lreg);
 			lreg = reg;
 		
 		}
 
 		// compare operands
-		file << "cmp " << lreg << "," << rreg << endl;
-		
+		cmp_x86(lreg, rreg);
 		
 		// free left register
 		if(root->getLeftChild()->getTToken() == "IDENTIFIER") free_reg(rreg);
@@ -277,7 +301,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	else if(root->getTToken() == "NUMBER") {
 		string val = root->getTValue();
 		string freg = get_free_reg();
-		file << "mov " << freg << "," << val << endl;
+		mov_x86(freg, val);
 		return freg;
 	}		
 
@@ -342,7 +366,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		
 		}
 
-		file << "add esp," << scope_table->table.size() * 4 << endl;
+		inc_esp_x86(scope_table->table.size()*4);
 		var_counter -= scope_table->table.size();
 				
 		delete scope_table;
@@ -363,7 +387,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 
 		file << "call " << root->getTValue() << endl;
-		file << "add esp," << func_params.size() * 4 << endl;
+		inc_esp_x86(func_params.size() * 4);
 		return root->getTValue();
 	
 	}
@@ -407,7 +431,6 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		loop_scope->parent_table = symbol_table;
 		loop_scope->table = {};
 		vector<SyntaxTree> func_params = st->get_function_parameters();
-		cout << func_params.size();
 		jmp_flag = 1;
 		string jmp_label = "l" + to_string(counter);
 		counter++;
