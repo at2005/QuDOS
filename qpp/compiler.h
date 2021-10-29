@@ -141,7 +141,7 @@ string get_word_reg(string reg) {
 	else if(reg == "esi") return "si";
 	else if(reg == "edi") return "di";
 	return "";
-
+	
 }
 
 

@@ -68,6 +68,7 @@ void main() {
 	// 
 	iret_stack* pstack_init = (iret_stack*)(new_proc->local_stack.esp);
 	
+//	check_bus();	
 
 	pstack_init->user_ds = 0x23;
 	pstack_init->proc_stack = new_proc->local_stack.esp;
@@ -76,10 +77,16 @@ void main() {
 	pstack_init->proc_ip = new_proc->eip;
 	current_proc = new_proc;
 
+	check_bus();
+	
+	map_identity(0xFEA00000);
+	uint32_t* bar = (uint32_t*)(0xFEA00000);
+	print_hex(*bar);
+		
 //	fork(new_proc);
 
 	//start_timer = 1;
-	enter_user_mode();
+//	enter_user_mode();
 
 
 }	

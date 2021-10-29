@@ -40,9 +40,7 @@ dd if=osimage.img of=drive.img conv=notrunc seek=0
 cp drive.img iso/
 genisoimage -quiet -V "MYOS" -input-charset iso8859-1 -o osimage.iso -b drive.img -hide drive.img iso/
 
-#qemu-system-i386 -d int -no-reboot -no-shutdown osimage
-
-qemu-system-i386 -fda drive.img -hda harddisk.img -m 1000M
+../qemu-custom/qemu/build/i386-softmmu/qemu-system-i386 -fda drive.img -hda harddisk.img -m 1000M --device edu
 
 rm drive.img
 rm osimage.img

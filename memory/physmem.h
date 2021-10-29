@@ -150,6 +150,7 @@ uint32_t get_ptoffset(uint32_t addr) {
 }
 
 
+// map an address to a physical page frame
 uint32_t kmmap(uint32_t addr) {
 	uint32_t* page_dir = getpd();
 	// get page dir offset and page table offset
@@ -174,6 +175,7 @@ uint32_t kmmap(uint32_t addr) {
 
 }
 
+
 uint32_t fetch_vpage() {
 	uint32_t* page_dir = getpd();
 	uint32_t page = (uint32_t)get_page();
@@ -194,7 +196,20 @@ uint32_t fetch_vpage() {
 
 }
 
-
+void map_identity(uint32_t phys_addr) {
+	uint32_t* page_dir = getpd();
+	uint32_t pd_offset = get_pde(phys_addr);
+	
+	if(page_dir[pd_offset == 0x2]) {
+		page_dir[pd_offset] = (uint32_t)(get_pts_page()) | 7;
+	}	
+	
+	
+	uint32_t pt_offset = get_ptoffset(phys_addr);
+	uint32_t* page_table = (uint32_t*)(page_dir[pd_offset] & 0xFFFFF000);
+	page_table[pt_offset] = (uint32_t)phys_addr | 7;
+	
+}
 
 #endif
 
