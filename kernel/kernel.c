@@ -11,6 +11,7 @@
 #include "../processes/exec.h"
 #include "../qc/qproc.h"
 #include "../drivers/pci.h"
+#include "../drivers/qcsim.h"
 
 extern void enter_user_mode();
 extern uint32_t tss_start;
@@ -79,13 +80,55 @@ void main() {
 
 	check_bus();
 	
+
+
 	map_identity(0xFEA00000);
-	uint32_t* bar = (uint32_t*)(0xFEA00000);
-	print_hex(*bar);
-		
+	map_identity(0xFEA40000);
+
+	uint8_t* dma = (uint8_t*)kmalloc(100);
+	
+	for(int i = 0; i < 100; i++) dma[i] = i;
+
+	
+
+/*	write_32_addr(0x88, 0xFEA40000);
+	write_32_addr(0x80, (uint32_t)dma);
+	write_32_addr(0x90, 100);
+	write_32_addr(0x98, 0x5);
+	
+	
+//       	read_32_addr(0);
+	//print_hex(dma[0]);
+	
+	while(!dma_flag);
+	
+	dma_flag = 0;
+	
+	uint8_t* buff_dma = (uint8_t*)kmalloc(0x1000);	
+	write_32_addr(0x88, (uint32_t)buff_dma);
+	write_32_addr(0x80, 0xFEA40000);
+	write_32_addr(0x90, 100);
+	write_32_addr(0x98, 0x7);
+	
+	while(!dma_flag);
+	
+	print_hex(buff_dma[0]);		
+
+*/
+	
+	uint8_t* buff_dma = (uint8_t*)kmalloc(100);	
+	qc_dma_write(dma, 100);
+	while(!dma_flag);
+	dma_flag = 0;
+	qc_dma_read(buff_dma, 100);
+	while(!dma_flag);
+	for(int i = 0; i < 21; i++) print_hex(buff_dma[i]);
+	
+
+
 //	fork(new_proc);
 
-	//start_timer = 1;
+//	start_timer = 1;
 //	enter_user_mode();
 
 

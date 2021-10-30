@@ -8,7 +8,7 @@ read:
 
 	mov cl, 0x02 ; read from second sector
 	
-	mov al,0x35 ; read 15 sectors
+	mov al,0x40 ; read 15 sectors
 	
 	int 0x13 ; call interrupt
 

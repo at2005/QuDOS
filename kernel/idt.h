@@ -8,6 +8,7 @@
 #include "../drivers/ata.h"
 #include "syscall.h"
 #include "../qc/qproc.h"
+#include "../drivers/qcsim.h"
 
 #define PICM_CONTROL 0x20
 #define PICS_CONTROL 0xA0
@@ -586,11 +587,20 @@ void irq10_handler() {
 }
 
 
+static int dma_flag = 0;
+
 void irq11_handler() {
-	print("IRQ11");
+	print("QC DMA IRQ\n");
+	
+	//write_32_addr(0x64, read_32_addr(0x24));
+	mmio_write32(mmio_read32(0xFEA00000, 0x24), 0xFEA00000, 0x64);
+	dma_flag = 1;
+
 	outb(0x20, PICS_CONTROL);
 	outb(0x20,PICM_CONTROL);
+
 }
+
 
 void irq12_handler() {
 	print("IRQ12");

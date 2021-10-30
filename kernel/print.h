@@ -191,6 +191,76 @@ void print_hex(uint32_t hex) {
 	
 }
 
+void printhb(uint8_t hex_dig) {
+	switch(hex_dig) {
+		case 0x0:
+			print("0000 ");
+			break;
+		
+		case 0x1:
+			print("0001 ");
+			break;
+		case 0x2:
+			print("0010 ");
+			break;
+		case 0x3:
+			print("0011 ");
+			break;
+		case 0x4:
+			print("0100 ");
+			break;
+		case 0x5:
+			print("0101 ");
+			break;
+		case 0x6:
+			print("0110 ");
+			break;
+
+		case 0x7:
+			print("0111 ");
+			break;
+
+		case 0x8:
+			print("1000 ");
+			break;
+
+		case 0x9:
+			print("1001 ");
+			break;
+		case 0xA:
+			print("1010 ");
+			break;
+		case 0xB:
+			print("1011 ");
+			break;
+		case 0xC:
+			print("1100 ");
+			break;
+		case 0xD:
+			print("1101 ");
+			break;
+		case 0xE:
+			print("1110 ");
+			break;
+		case 0xF:
+			print("1111 ");
+			break;
+	}
+
+}
+
+
+void print_bitstr(uint32_t hex) {
+	
+	for(int i = 0; i < 8; i++) {
+		printhb((hex & 0xF0000000) >> 28);
+		hex <<= 4;		
+	}
+	
+	print("\n");
+}
+
+
 
 
 // get cursor offset
