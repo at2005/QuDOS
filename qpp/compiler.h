@@ -377,8 +377,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	}
 
 
-	else if(root->getTToken() == "FCALL") {
-		
+	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
@@ -392,6 +391,10 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	
 	}
 
+	else if(isAssembly(root->getTValue())) {
+		mov_x86("[__qubit__]", "2");
+	
+	}
 
 	else if(root->getTValue() == "for") {
 		
