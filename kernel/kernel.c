@@ -116,20 +116,19 @@ void main() {
 
 */
 	
-	uint8_t* buff_dma = (uint8_t*)kmalloc(100);	
+/*	uint8_t* buff_dma = (uint8_t*)kmalloc(100);	
 	qc_dma_write(dma, 100);
 	while(!dma_flag);
 	dma_flag = 0;
 	qc_dma_read(buff_dma, 100);
 	while(!dma_flag);
-	for(int i = 0; i < 21; i++) print_hex(buff_dma[i]);
-	
-
+//	for(int i = 0; i < 21; i++) print_hex(buff_dma[i]);
+*/
 
 //	fork(new_proc);
 
-//	start_timer = 1;
-//	enter_user_mode();
+	start_timer = 1;
+	enter_user_mode();
 
 
 }	

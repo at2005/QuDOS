@@ -390,6 +390,10 @@ uint32_t qcall_handler(sys_args qparams) {
 	
 	}	
 
+	else if(qparams.eax == 1) {
+		qc_dma_write(qparams.ebx, 4096);
+	}
+
 }
 
 

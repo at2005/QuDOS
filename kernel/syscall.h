@@ -28,6 +28,7 @@ uint32_t screenprh_sysc(sys_args regs) {
 
 
 uint32_t keyen_sysc(sys_args regs) {
+
 	enable_keyboard();
 	char_buff = (char*)regs.ebx;
 	buff_count= 0;
