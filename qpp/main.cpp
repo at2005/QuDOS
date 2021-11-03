@@ -28,7 +28,7 @@ int main() {
 	Node* root = main_tree->getRoot();
 	
 	free_regs = {0,0,0,0,0,0};
-	file << "[extern printh]\n[extern printf]\n";
+	file << "[extern printh]\n[extern printf]\n[extern scanf]\n";
 	file << "section .text:\nglobal main\nmain:\n";
 	
 	std::unordered_map<string,int> mtable = {};
@@ -44,8 +44,8 @@ int main() {
 	file << "add esp," << var_counter*4 << endl;	
 	file << "ret\n";	
 
-	file << data_section;
-
+	file << data_section << endl;
+	file << bss_section;
 	return 0;
 
 

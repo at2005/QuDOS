@@ -13,7 +13,8 @@ struct
 		{"super" , 1},
 		{"int" , 1},
 		{"float" , 1},
-		{"string", 1}
+		{"string", 1},
+		{"char", 1}
 	};
 
 	unordered_map<string, int> keyword = {

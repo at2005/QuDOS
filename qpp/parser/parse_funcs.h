@@ -220,10 +220,13 @@ inline Node* parse_maths(vector<Pair> input) {
 				try {
 					if (has_seen_op) {
 
+						currentParent->getRightChild()->flip_classical();	
 						currentParent->getRightChild()->setPurpose(input[i + 1].getValue());
 					}
 
 					else {
+						currentParent->getLeftChild()->flip_classical();	
+
 						currentParent->getLeftChild()->setPurpose(input[i + 1].getValue());
 
 					}
@@ -244,7 +247,7 @@ inline Node* parse_maths(vector<Pair> input) {
 					//setting the previous operator to this
 					prev_op = input[i];
 					currentParent->setTreeTV(input[i]);
-					currentParent->setPurpose(input[i].getValue());
+					//currentParent->setPurpose(input[i].getValue());
 				}
 
 				else if (has_seen_op) {

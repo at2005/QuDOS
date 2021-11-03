@@ -208,8 +208,14 @@ private:
 			//for(int i = 0; i < inputExpr.size(); i++) cout << inputExpr[i].getValue() << endl; 
 			
 			root =  new Node(Pair("=", "ASSIGNMENT"), "assignment");
-			
+				
 			root->createLeftChild(inputExpr[1], inputExpr[0].getValue());
+			vector<Pair> array = parse_between("[", "]", inputExpr);
+			string array_size = "";
+			for(int i = 0; i < array.size(); i++) array_size += array[i].getValue();
+			
+			root->setPurpose("h");
+			if(array_size.size() != 0) root->setPurpose(array_size);
 			vector<Pair> tempVec = {};
 			int index = 0;
 			for (int i = 0; i < inputExpr.size(); i++) {

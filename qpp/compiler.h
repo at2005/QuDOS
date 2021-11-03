@@ -48,7 +48,7 @@ static int string_counter = 0;
 static ofstream file("./out.asm");
 // string corresponding to data section of file
 string data_section = "section .data:\n";
-
+string bss_section = "section .bss:\n";
 // structure for symbol table
 typedef struct symtab {
 	std::unordered_map<string, int> table;
@@ -307,9 +307,25 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	else if(root->getTToken() == "IDENTIFIER") {
 		int pos = search_symtab(symbol_table, root->getTValue());
-		return " dword [esp+" + to_string(4*(var_counter - (pos + 1))) + "]";		
+		string offset =  to_string(4*(var_counter - (pos + 1)));	
+		string val = " dword [esp+" + (offset) + "]";
+		if(root->is_classical()) {
+			string reg = get_free_reg();
+			mov_x86(reg, val);
+		
+			SyntaxTree subs = SyntaxTree(new Node(Pair(root->getPurpose(), "IDENTIFIER")));
+			
+			file << "add " << reg << "," << compile(&subs, symbol_table) << endl;
+			return "[" + reg + "]";
+
+		}
+
+		return val;	
 	
 	}
+
+	
+
 
 	else if(root->getTToken() == "STRING") {
 		string str_label =  "s" + to_string(string_counter); 
@@ -339,8 +355,20 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	else if(root->getTToken() == "ASSIGNMENT") {
 		string var_name = root->getLeftChild()->getTValue();
 		symbol_table->table.insert({var_name, var_counter});
+		
+		if(isNumeric(root->getPurpose())) {
+			bss_section += "num resb 256\n";	
+			file << "push num\n";
+			var_counter++;
+			return "num";	
+		}
+
+
+
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 		string res = compile(&right_tree, symbol_table);
+		
+		
 		file << "push " << res << endl;
 		free_reg(res);
 		var_counter++;
