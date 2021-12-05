@@ -215,8 +215,10 @@ void initialize_keyboard() {
 	struct key_value ncap_pressed = {0x31, 'N'};	
 	struct key_value mcap_pressed = {0x32, 'M'};
 	struct key_value langle_pressed = {0x33, '<'};
-	struct key_value rangle_pressed = {0x34, '>'};
-	
+	struct key_value rangle_pressed = {0x34, '>'};	
+	struct key_value lparen_pressed = {0x0A, '('};
+	struct key_value rparen_pressed = {0x0B, ')'};
+
 	add_hash_table(exclm_pressed, keyboard_shift_map_array);
 	add_hash_table(qm_pressed, keyboard_shift_map_array);
 	add_hash_table(underscore_pressed, keyboard_shift_map_array);
@@ -251,7 +253,8 @@ void initialize_keyboard() {
 	add_hash_table(dqt_pressed, keyboard_shift_map_array);
 	add_hash_table(langle_pressed, keyboard_shift_map_array);
 	add_hash_table(rangle_pressed, keyboard_shift_map_array);
-
+	add_hash_table(lparen_pressed, keyboard_shift_map_array);
+	add_hash_table(rparen_pressed, keyboard_shift_map_array);
 }
 
 

@@ -49,9 +49,8 @@ void init_syscall() {
 	tcodes[1][0] = (uint32_t*)screenpr_sysc;
 	tcodes[2][0] = (uint32_t*)screenprh_sysc;
 	tcodes[3][0] = (uint32_t*)keyen_sysc;
-	tcodes[3][1] = (uint32_t*)keyisen_sysc;
+	tcodes[3][1] = (uint32_t*)keyisen_sysc;	
 
-	
 
 }
 

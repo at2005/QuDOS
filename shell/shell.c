@@ -5,6 +5,9 @@ extern void printf(char* in);
 extern void printh(int a);
 extern void scanf(char* buffer);
 extern uint32_t quant();
+extern void execq(uint8_t* a, size_t len);
+
+extern void runq();
 
 void flush(char* buffer) {
 
@@ -13,7 +16,7 @@ void flush(char* buffer) {
 }
 
 int main() {
-	printf("QOS Developed By Ayush Tambde (2021)\n\n");
+/*	printf("QOS Developed By Ayush Tambde (2021)\n\n");
 	char buffer[256];
 	flush(buffer);
 		
@@ -32,6 +35,20 @@ int main() {
 	//uint8_t* buffer = (uint8_t*)quant();
 		
 
+*/
+
+	uint8_t* qbuff = quant();
+	qbuff[0] = 0xA;
+	qbuff[1] = 0;
+
+	for(int i = 0; i < 10; i++) printh(qbuff[i]);
+
+	execq(qbuff,10);
+
+//	for(int i = 0; i < 100000000; i++) i*2;	
+	runq();		
+	
+	printf("a");
 
 	return 0;
 }

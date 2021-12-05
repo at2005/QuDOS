@@ -86,8 +86,6 @@ uint32_t get_bar(uint8_t bus, uint8_t device, uint8_t func) {
 }
 
 
-
-
 void check_bus() {
 	for(int i = 0; i < 256; i++) {
 		for(int j = 0; j < 32; j++) {

@@ -18,6 +18,7 @@
 
 static char* buff_flush_addr = 0x0;
 
+static int dma_flag = 0;
 // entry for each IRQ in interrupt descriptor table
 struct idt_entry {
 	// holds lower 16 bits of irq handler address
@@ -385,13 +386,30 @@ uint32_t fetch_vpage();
 
 uint32_t qcall_handler(sys_args qparams) {
 	if(qparams.eax == 0) {
-		
 		return (uint32_t)(create_qproc()->qdata);
 	
 	}	
 
+
 	else if(qparams.eax == 1) {
-		qc_dma_write(qparams.ebx, 4096);
+		//print_hex(qparams.ebx);
+		//print_hex(qparams.ecx);
+		
+		uint8_t* buff = (uint8_t*)(qparams.ebx);
+	//	for(int i = 0; i < qparams.ecx; i++) print_hex(buff[i]);
+		qc_dma_write((uint8_t*)(qparams.ebx), qparams.ecx);
+	//	while(!dma_flag);
+	}
+
+
+	else if(qparams.eax == 2) {
+		print("executing quantum interrupt...\n");
+		run_quantum();
+	
+	}
+
+	else if(qparams.eax == 3) {
+		return dma_flag;
 	}
 
 }
@@ -591,10 +609,8 @@ void irq10_handler() {
 }
 
 
-static int dma_flag = 0;
 
 void irq11_handler() {
-	print("QC DMA IRQ\n");
 	
 	//write_32_addr(0x64, read_32_addr(0x24));
 	mmio_write32(mmio_read32(0xFEA00000, 0x24), 0xFEA00000, 0x64);

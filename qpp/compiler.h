@@ -407,15 +407,19 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
+		int vc_copy = var_counter;
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
+			var_counter++;
 			file << "push " << param << endl;
 			free_reg(param);
 		}
 
+		var_counter = vc_copy;
+
 		file << "call " << root->getTValue() << endl;
 		inc_esp_x86(func_params.size() * 4);
-		return root->getTValue();
+		return "eax";
 	
 	}
 

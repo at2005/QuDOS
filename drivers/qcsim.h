@@ -33,5 +33,10 @@ void qc_dma_write(uint8_t* buffer, size_t len) {
 }
 
 
+void run_quantum() {
+	mmio_write32(0x1, QC_BASE, (uint32_t)0x08);
+
+}
+
 
 #endif

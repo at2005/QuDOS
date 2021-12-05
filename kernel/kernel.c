@@ -87,48 +87,31 @@ void main() {
 
 	uint8_t* dma = (uint8_t*)kmalloc(100);
 	
-	for(int i = 0; i < 100; i++) dma[i] = i;
+	for(int i = 0; i < 100; i++) dma[i] = 10;
+		
+	
+//	print_hex(buff_dma[0]);		
 
 	
-
-/*	write_32_addr(0x88, 0xFEA40000);
-	write_32_addr(0x80, (uint32_t)dma);
-	write_32_addr(0x90, 100);
-	write_32_addr(0x98, 0x5);
-	
-	
-//       	read_32_addr(0);
-	//print_hex(dma[0]);
-	
-	while(!dma_flag);
-	
-	dma_flag = 0;
-	
-	uint8_t* buff_dma = (uint8_t*)kmalloc(0x1000);	
-	write_32_addr(0x88, (uint32_t)buff_dma);
-	write_32_addr(0x80, 0xFEA40000);
-	write_32_addr(0x90, 100);
-	write_32_addr(0x98, 0x7);
-	
-	while(!dma_flag);
-	
-	print_hex(buff_dma[0]);		
-
-*/
-	
-/*	uint8_t* buff_dma = (uint8_t*)kmalloc(100);	
+	uint8_t* buff_dma = (uint8_t*)kmalloc(100);	
 	qc_dma_write(dma, 100);
 	while(!dma_flag);
 	dma_flag = 0;
-	qc_dma_read(buff_dma, 100);
+
+	//mmio_write32(0x1, QC_BASE, 0x08);
+	
+	/*	qc_dma_read(buff_dma, 100);
 	while(!dma_flag);
-//	for(int i = 0; i < 21; i++) print_hex(buff_dma[i]);
+	dma_flag = 0;
+	//for(int i = 0; i < 21; i++) print_hex(buff_dma[i]);
 */
 
 //	fork(new_proc);
 
 	start_timer = 1;
 	enter_user_mode();
+
+	
 
 
 }	

@@ -15,8 +15,9 @@ ld shell/sys.o shell/shell.o -o shell/shell.bin -melf_i386
 
 
 dd if=test2.bin of=harddisk.img bs=1 count=8192 seek=4096x6 conv=notrunc
-dd if=qpp/out.bin of=harddisk.img bs=1 count=9000 seek=4096x8 conv=notrunc
+dd if=shell/shell.bin of=harddisk.img bs=1 count=9000 seek=4096x8 conv=notrunc
 
+#dd if=qpp/out.bin of=harddisk.img bs=1 count=9000 seek=4096x8 conv=notrunc
 gcc -ffreestanding -m32 -fno-pie -c kernel/kernel.c -o kernel/kernel.o
 
 nasm -felf32 -o kernel/lkernel.o kernel/lkernel.asm
@@ -40,7 +41,7 @@ dd if=osimage.img of=drive.img conv=notrunc seek=0
 cp drive.img iso/
 genisoimage -quiet -V "MYOS" -input-charset iso8859-1 -o osimage.iso -b drive.img -hide drive.img iso/
 
-../qemu-custom/QEMU-Quantum-PCI-Device/qemu/build/i386-softmmu/qemu-system-i386 -fda drive.img -hda harddisk.img -m 1000M --device qc
+../qemu-custom/qemu/build/i386-softmmu/qemu-system-i386 -fda drive.img -hda harddisk.img -m 1000M --device qc
 
 rm drive.img
 rm osimage.img
