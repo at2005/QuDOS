@@ -7,31 +7,33 @@ int function newline(int a) {
 
 
 function main() {
-	int var = 12;
-	int var2 = 4;	
-	if(var > var2) {
-		for(int i = 10, i >= 0, i-=1) {
-			#printh(i);
-		
-		}
+        H(0);
 
-	
-	
-	}
+#	int var = 12;
+#	int var2 = 4;	
+#	if(var > var2) {
+#		for(int i = 10, i >= 0, i-=1) {
+#			#printh(i);
+#		
+#		}
+#
+#	
+#	
+#	}
 
-	string msg = "Q++ Shell For QOS Programmed By Ayush Tambde\n";
-	printf(msg);
-	char buff[256];
-	while(1==1) {
-		printf("A> ");
-		scanf(buff);
-		printf(buff);
-                newline();
-		zero_buffer(buff, 256);		
-
-	}
-
-
+#	string msg = "Q++ Shell For QOS Programmed By Ayush Tambde\n";
+#	printf(msg);
+#	char buff[256];
+#	while(1==1) {
+#		printf("A> ");
+#		scanf(buff);
+#		printf(buff);
+#                newline();
+#		zero_buffer(buff, 256);		
+#
+#	}
+#
+#
 }
 
 

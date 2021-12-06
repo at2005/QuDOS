@@ -49,6 +49,7 @@ static ofstream file("./out.asm");
 // string corresponding to data section of file
 string data_section = "section .data:\n";
 string bss_section = "section .bss:\n";
+string quant_reg = "";
 // structure for symbol table
 typedef struct symtab {
 	std::unordered_map<string, int> table;
@@ -424,7 +425,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	}
 
 	else if(isAssembly(root->getTValue())) {
-		mov_x86("[__qubit__]", "2");
+		string opcode = "";
+		if(root->getTValue() == "H") opcode = "0xA";
+		else if(root->getTValue() == "X") opcode = "0xB";
+		vector<SyntaxTree> func_params = st->get_function_parameters();
+		string param = compile(&(func_params[0]), symbol_table);
+		mov_x86("byte ["+quant_reg+"]", opcode);
+		file << "inc " << quant_reg << endl;
+		mov_x86("byte ["+quant_reg+"]", get_byte_reg(param));
+		file << "inc " << quant_reg << endl;	
 	
 	}
 

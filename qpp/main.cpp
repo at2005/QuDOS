@@ -14,7 +14,7 @@ int main() {
 	
 	
 	free_regs = {0,0,0,0,0,0};
-	file << "[extern printh]\n[extern printf]\n[extern scanf]\n[extern zero_buffer]\n";
+	file << "[extern printh]\n[extern printf]\n[extern scanf]\n[extern zero_buffer]\n[extern quant]\n";
 	file << "section .text:\nglobal main\n";
 	
 	std::unordered_map<string,int> mtable = {};
@@ -30,6 +30,13 @@ int main() {
 //		if(st->getRoot()->getTValue() == "main") {
 			//*main_tree = *st;
 			file << st->getRoot()->getTValue() << ":\n";
+			
+			if(st->getRoot()->getTValue() == "main") {
+				string fr = get_free_reg();
+				quant_reg = fr;
+				file << "call quant\nmov " << fr << ",eax\n";
+			}
+
 			for(int i = 0; i < st->get_child_trees().size(); i++) { 
 				compile(&(st->get_child_trees()[i]), main_table);	
 			}
