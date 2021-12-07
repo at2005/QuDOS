@@ -426,22 +426,27 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	else if(isAssembly(root->getTValue())) {
 		string opcode = "";
-		if(root->getTValue() == "H") opcode = "0xA";
-		else if(root->getTValue() == "X") opcode = "0xB";
+		if(root->getTValue() == "H") opcode = "0x0";
+		else if(root->getTValue() == "X") opcode = "0x1";
+		else if(root->getTValue() == "Y") opcode = "0x2";
+		else if(root->getTValue() == "Z") opcode = "0x3";
+		else if(root->getTValue() == "ID") opcode = "0x4";
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
 		mov_x86("byte ["+quant_reg+"]", opcode);
 		file << "inc " << quant_reg << endl;
 		mov_x86("byte ["+quant_reg+"]", get_byte_reg(param));
 		file << "inc " << quant_reg << endl;	
+		free_reg(param);
 	
 	}
 
 	else if(root->getTToken() == "KEYWORD") {
-		if(root->getTValue() == "execq") file << "pushad\npush dword [__q__]\ncall execq\nadd esp, 4\npopad\n";
+		if(root->getTValue() == "execq") file << "mov byte [eax], 0xD\npushad\npush dword [__q__]\ncall execq\nadd esp, 4\npopad\n";
 		else if (root->getTValue() == "link") {
 			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
 			file << "[extern " << func_name << "]\n";
+
 		}
 	
 	}

@@ -16,10 +16,36 @@ call quant
 mov eax,eax
 mov dword [__q__], eax
 mov ebx,0
-mov byte [eax],0xA
+mov byte [eax],0x1
 inc eax
 mov byte [eax],bl
 inc eax
+mov ebx,0
+mov byte [eax],0x0
+inc eax
+mov byte [eax],bl
+inc eax
+mov ebx,2
+mov byte [eax],0x1
+inc eax
+mov byte [eax],bl
+inc eax
+mov ebx,3
+mov byte [eax],0x0
+inc eax
+mov byte [eax],bl
+inc eax
+mov ebx,2
+mov byte [eax],0x3
+inc eax
+mov byte [eax],bl
+inc eax
+mov ebx,1
+mov byte [eax],0x2
+inc eax
+mov byte [eax],bl
+inc eax
+mov byte [eax], 0xD
 pushad
 push dword [__q__]
 call execq

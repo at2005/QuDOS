@@ -66,7 +66,7 @@ execq:
 	
 	mov ebx, [esp+4]
 	mov dword eax, 1
-	mov dword ecx, 10
+	mov dword ecx, 16
 	mov edx, 0
 	int 0x40
 	

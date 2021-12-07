@@ -14,8 +14,14 @@ int function newline(int a) {
 
 
 function main() {
-        H(0);
-
+        X(0);
+	H(0);
+	X(2);
+	H(3);
+	Z(2);
+	Y(1);
+	
+	
 	execq;
 
 
