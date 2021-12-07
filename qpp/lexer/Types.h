@@ -19,7 +19,9 @@ struct
 
 	unordered_map<string, int> keyword = {
 		{"measure", 1},
-		{"return", 1}
+		{"return", 1},
+		{"execq",1},
+		{"link", 1}
 	};
 
 

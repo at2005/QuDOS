@@ -437,6 +437,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	
 	}
 
+	else if(root->getTToken() == "KEYWORD") {
+		if(root->getTValue() == "execq") file << "pushad\npush dword [__q__]\ncall execq\nadd esp, 4\npopad\n";
+		else if (root->getTValue() == "link") {
+			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
+			file << "[extern " << func_name << "]\n";
+		}
+	
+	}
+
 	else if(root->getTValue() == "for") {
 		
 		symtab* loop_scope = new symtab;

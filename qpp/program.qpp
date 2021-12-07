@@ -1,4 +1,11 @@
 
+link printf;
+link execq;
+link printh;
+link zero_buffer;
+link quant;
+
+
 
 int function newline(int a) {
 	printf("\n");	
@@ -8,6 +15,9 @@ int function newline(int a) {
 
 function main() {
         H(0);
+
+	execq;
+
 
 #	int var = 12;
 #	int var2 = 4;	

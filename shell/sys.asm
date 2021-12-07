@@ -63,9 +63,10 @@ quant:
 
 
 execq:
-	mov eax, 1
-	mov dword ebx, [esp+4]
-	mov dword ecx, [esp+8]
+	
+	mov ebx, [esp+4]
+	mov dword eax, 1
+	mov dword ecx, 10
 	mov edx, 0
 	int 0x40
 	
@@ -78,16 +79,16 @@ execq:
 		cmp eax, 1
 		jne lp
 
-
-	ret
-	
-global runq
-runq:
 	mov eax,2
 	mov ebx, 0
 	mov ecx, 0
 	mov edx,0
 	int 0x40
+
+	ret
+	
+global runq
+runq:
 	ret
 
 

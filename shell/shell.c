@@ -39,7 +39,7 @@ int main() {
 
 	uint8_t* qbuff = quant();
 	qbuff[0] = 0xA;
-	qbuff[1] = 0;
+	qbuff[1] = 0x1;
 
 	for(int i = 0; i < 10; i++) printh(qbuff[i]);
 
