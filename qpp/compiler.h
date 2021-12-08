@@ -448,6 +448,14 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			file << "[extern " << func_name << "]\n";
 
 		}
+
+		else if(root->getTValue() == "nloc") {
+			cout << st->get_function_parameters().size();
+			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
+			
+			file << "pushad\npush " << func_name << endl << "call sendq\n add esp,4\npopad\n";
+		
+		}
 	
 	}
 

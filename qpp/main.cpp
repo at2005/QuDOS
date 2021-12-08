@@ -12,6 +12,7 @@ int main() {
 	vector<Pair> token_values = execute_lex("program.qpp").getLex().dict_output;
 	vector<vector<Pair>> expressions = getEachExpression(token_values);
 	
+//	execute_lex("program.qpp").getLex().printLex();	
 	
 	free_regs = {0,0,0,0,0,0};
 	file << "section .text:\nglobal main\n";
@@ -40,7 +41,8 @@ int main() {
 			}
 
 			file << "add esp," << var_counter*4 << endl;	
-			file << "ret\n";	
+			file << "ret\n";
+			file << "dd 0xDEADC0DE\n";	
 		}
 
 		else compile(st, main_table);

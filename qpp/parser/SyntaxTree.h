@@ -44,8 +44,9 @@ public:
 
 		
 		else if (inputExpr.size() == 2 && inputExpr[0].getToken() == "KEYWORD") {
-			//cout << "this is a keyword";
-		
+			cout << "hello\n\n";
+			//cout << inputExpr[0].getValue();
+				
 			this->root_of_tree =  new Node(inputExpr[0], inputExpr[0].getValue());
 			vector<Pair> id = { inputExpr[1] };
 			SyntaxTree st(id);
@@ -69,7 +70,6 @@ public:
 		}
 
 		else if (expression_type == "KEYWORD_OPERATION") {
-			//cout << "hey2";
 			check = true;
 			this->root_of_tree = createKeywordTree(inputExpr);
 		}
@@ -250,10 +250,10 @@ private:
 		Node* root =  new Node(inputExpr[0], inputExpr[0].getValue());
 
 		for (int i = 1; i < inputExpr.size(); i++) {
-			if (inputExpr[i].getToken() == "IDENTIFIER") {
+			if (inputExpr[i].getToken() == "IDENTIFIER" || inputExpr[i].getToken() == "FCALL") {
 				vector<Pair> individual_expr = {inputExpr[i]};
 				SyntaxTree st(individual_expr);
-				this->child_trees.push_back(st);
+				this->function_parameters.push_back(st);
 			}
 		}
 		return root;

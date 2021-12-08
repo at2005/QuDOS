@@ -21,7 +21,8 @@ struct
 		{"measure", 1},
 		{"return", 1},
 		{"execq",1},
-		{"link", 1}
+		{"link", 1},
+		{"nloc", 1}
 	};
 
 

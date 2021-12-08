@@ -171,6 +171,8 @@ inline Node* parse_maths(vector<Pair> input) {
 
 		for (int i = 0; i < input.size(); i++) {
 			if (input[i].getToken() == "NUMBER" || input[i].getToken() == "IDENTIFIER" || input[i].getToken() == "KEYWORD" || input[i].getToken() == "BUILT_IN_FUNCTION" || input[i].getToken() == "ASSEMBLY_INSTRUCTION") {
+
+
 				has_seen_id = true;
 				//creates numbers as left and right children of the operator Node
 				if (has_seen_op) {
