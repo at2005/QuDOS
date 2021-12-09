@@ -9,6 +9,8 @@
 #include "syscall.h"
 #include "../qc/qproc.h"
 #include "../drivers/qcsim.h"
+#include "../qc/qproc.h"
+#include "../general/general.h"
 
 #define PICM_CONTROL 0x20
 #define PICS_CONTROL 0xA0
@@ -385,32 +387,52 @@ void initialize_idt() {
 uint32_t fetch_vpage();
 
 uint32_t qcall_handler(sys_args qparams) {
-	if(qparams.eax == 0) {
-		return (uint32_t)(create_qproc()->qdata);
+	switch(qparams.eax) {
+		case 0:
+			current_proc->qproc = create_qproc();
+			return (uint32_t)(current_proc->qproc->qdata);
+			break;
+
+
+		case 1:;
+			uint8_t* buff = (uint8_t*)(qparams.ebx);
+			qc_dma_woffset((uint8_t*)(qparams.ebx), 1024, qparams.ecx);
+			break;
+
+		case 2:
+			run_quantum();
+			break;
 	
-	}	
 
+		case 3:
+			return dma_flag;
+			break;
+	
 
-	else if(qparams.eax == 1) {
-		//print_hex(qparams.ebx);
-		//print_hex(qparams.ecx);
-		
-		uint8_t* buff = (uint8_t*)(qparams.ebx);
-	//	for(int i = 0; i < qparams.ecx; i++) print_hex(buff[i]);
-		qc_dma_write((uint8_t*)(qparams.ebx), qparams.ecx);
-	//	while(!dma_flag);
-	}
+		case 4:;
+			uint8_t* func_start = (uint8_t*)(qparams.ebx);
+			int i = 0;
+			int strike = 0;
+			while(strike < 2) {
+				if(func_start[i] == 0xC0 || func_start[i] == 0xDE) strike++;
+				else strike = 0;
+				i++;
+			
+			}
+			
+			i*=4;
+			
+			memcpy((uint8_t*)func_start,(uint8_t*)(current_proc->qproc->cdata), i); 
+			//qc_dma_write((uint8_t*)(func_start), i);
+			
+			
+			break;
+			
 
-
-	else if(qparams.eax == 2) {
-		print("executing quantum interrupt...\n");
-		run_quantum();
 	
 	}
 
-	else if(qparams.eax == 3) {
-		return dma_flag;
-	}
+	return 0;
 
 }
 

@@ -8,6 +8,7 @@ global scanf
 global quant
 global zero_buffer
 global execq
+global sendq
 
 _start:
 	call main
@@ -66,7 +67,7 @@ execq:
 	
 	mov ebx, [esp+4]
 	mov dword eax, 1
-	mov dword ecx, 16
+	mov dword ecx, 1024
 	mov edx, 0
 	int 0x40
 	
@@ -87,11 +88,14 @@ execq:
 
 	ret
 	
-global runq
-runq:
+sendq:
+	mov eax, 4
+	mov ebx, [esp+4]
+	mov ecx, 0
+	mov edx, 0
+	int 0x40
+	
 	ret
-
-
 
 
 zero_buffer:

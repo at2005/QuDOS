@@ -456,6 +456,19 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			file << "pushad\npush " << func_name << endl << "call sendq\n add esp,4\npopad\n";
 		
 		}
+
+		else if(root->getTValue() == "return") {
+			if(st->get_function_parameters().size() != 0) {
+				SyntaxTree param = st->get_function_parameters()[0];
+				string obj_to_ret = compile(&(param), symbol_table);
+				mov_x86("eax", obj_to_ret);
+
+			}
+
+			file << "add esp," << var_counter*4 << endl;	
+			file << "ret\n";
+
+		}
 	
 	}
 

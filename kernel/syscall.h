@@ -13,7 +13,7 @@ typedef struct sys_args {
 
 } sys_args;
 
-void* kmalloc(size_t bytes);
+void* kmalloc(size_t bytes_req);
 
 uint32_t screenpr_sysc(sys_args regs) {
 	print((char*)(regs.ebx));

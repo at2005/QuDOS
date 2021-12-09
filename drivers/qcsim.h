@@ -32,6 +32,23 @@ void qc_dma_write(uint8_t* buffer, size_t len) {
 
 }
 
+void qc_dma_woffset(uint8_t* buffer, uint32_t offset, size_t len) {
+	mmio_write32((uint32_t)buffer, QC_BASE, QC_DMA_SRC);
+	mmio_write32(QC_DMA+offset, QC_BASE, QC_DMA_DST);
+	mmio_write32(len, QC_BASE, QC_DMA_CNT);
+	mmio_write32(QC_CMD_WRITE, QC_BASE, QC_DMA_CMD);
+
+}
+
+void qc_dma_roffset(uint8_t* buffer, uint32_t offset, size_t len) {
+	mmio_write32(QC_DMA+offset, QC_BASE, QC_DMA_SRC);
+	mmio_write32((uint32_t)buffer, QC_BASE, QC_DMA_DST);
+	mmio_write32(len, QC_BASE, QC_DMA_CNT);
+	mmio_write32(QC_CMD_READ, QC_BASE, QC_DMA_CMD);
+
+}
+
+
 
 void run_quantum() {
 	mmio_write32(0x1, QC_BASE, (uint32_t)0x08);

@@ -15,6 +15,8 @@
 
 #include <stdbool.h>
 
+void* kmalloc(size_t bytes_req);
+
 // doubly linked list for physical frame allocation
 typedef struct dlist {
 	// left link to previous node

@@ -11,8 +11,10 @@
 #define PROC_CREATED 0
 
 #include <stddef.h>
+#include "../qc/qproc.h"
 
-void* kmalloc(size_t bytes_req);
+
+//void* kmalloc(size_t bytes_req);
 
 typedef struct pframe_entry {
 	uint32_t* addr;
@@ -28,7 +30,6 @@ typedef struct iret_stack {
 	uint32_t proc_stack;
 	uint32_t user_ds;
 } iret_stack;
-
 
 
 // structure to store register states during context switching
@@ -94,8 +95,11 @@ typedef struct process_struct {
 	
 	// where to JMP when loading process
 	uint32_t code_segment;
+	
+	qproc_struct* qproc; 
 
 	pframe_entry* pf_list;
+
 
 	// next process
 	struct process_struct* next_proc;
@@ -146,8 +150,6 @@ process_struct* create_proc(uint32_t* proc_ip, pframe_entry* pf_ls) {
 	new_proc->eip = (uint32_t)proc_ip;
 	// set start address
 	new_proc->program_start = (uint32_t)proc_ip;
-//	new_proc->kstack = 0x09001FF0 - sizeof(iret_stack);
-//	map_page(0x09001000);
 	// add process to process table
 	add_proc(new_proc);
 	return new_proc;
