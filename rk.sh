@@ -13,6 +13,9 @@ nasm -felf32 -o shell/sys.o shell/sys.asm
 gcc -Wall -ffreestanding -fno-pie -m32 -c shell/shell.c -o shell/shell.o
 #ld shell/sys.o shell/shell.o -o shell/shell.bin -melf_i386
 
+cd qpp
+rm qpp; make
+cd -
 
 dd if=test2.bin of=harddisk.img bs=1 count=8192 seek=4096x6 conv=notrunc
 dd if=qpp/out.bin of=harddisk.img bs=1 count=9000 seek=4096x8 conv=notrunc

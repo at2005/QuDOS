@@ -395,8 +395,12 @@ uint32_t qcall_handler(sys_args qparams) {
 
 
 		case 1:;
-			uint8_t* buff = (uint8_t*)(qparams.ebx);
-			qc_dma_woffset((uint8_t*)(qparams.ebx), 1024, qparams.ecx);
+		       	uint8_t* buff_qdata = (uint8_t*)(qparams.ebx);
+
+			//for(int i = 0; i < 28; i++) print_hex(buff_cdata[i]);
+
+			qc_dma_woffset(buff_qdata,1024, qparams.ecx);
+		
 			break;
 
 		case 2:
@@ -410,6 +414,7 @@ uint32_t qcall_handler(sys_args qparams) {
 	
 
 		case 4:;
+		       dma_flag = 0;
 			uint8_t* func_start = (uint8_t*)(qparams.ebx);
 			int i = 0;
 			int strike = 0;
@@ -419,13 +424,21 @@ uint32_t qcall_handler(sys_args qparams) {
 				i++;
 			
 			}
-			
-			i*=4;
+	
+			i-=2;
 			
 			memcpy((uint8_t*)func_start,(uint8_t*)(current_proc->qproc->cdata), i); 
-			//qc_dma_write((uint8_t*)(func_start), i);
 			
 			
+			break;
+
+
+		case 5:;
+			
+			dma_flag = 0;
+			uint8_t* buff_cdata = (uint8_t*)(current_proc->qproc->cdata);
+
+			qc_dma_write(buff_cdata, 256);
 			break;
 			
 

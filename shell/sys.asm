@@ -64,30 +64,54 @@ quant:
 
 
 execq:
-	
+
+	; send quantum data via DMA
 	mov ebx, [esp+4]
 	mov dword eax, 1
-	mov dword ecx, 1024
+	mov dword ecx, 512
 	mov edx, 0
 	int 0x40
+
+	; poll until IRQ fires
+	call poll
+
 	
-	lp:
-		mov eax, 3
-		mov ebx,0
-		mov ecx, 0
-		mov edx, 0
-		int 0x40
-		cmp eax, 1
-		jne lp
+	mov eax, 5
+	mov ebx, 0
+	mov ecx, 0
+	mov edx, 0
+	int 0x40
+	; poll until IRQ happens
+	call poll	
+
+	call run
+
+	ret
+
+
+
+poll:
+	mov eax, 3
+	mov ebx,0
+	mov ecx, 0
+	mov edx, 0
+	int 0x40
+	cmp eax, 1
+	jne poll
+	ret
+
+	
+run:
 
 	mov eax,2
 	mov ebx, 0
 	mov ecx, 0
 	mov edx,0
 	int 0x40
-
 	ret
-	
+
+
+
 sendq:
 	mov eax, 4
 	mov ebx, [esp+4]

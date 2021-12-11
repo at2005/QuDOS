@@ -4,16 +4,14 @@ link sendq;
 link execq;
 
 function a() {
-	int b = 0;
-	b += 2;
-	return b;
+	return 5;
 
 }
 
 function main() {
 	H(0);
-	execq;
 	nloc a();
+	execq;
 	return;
 
 }

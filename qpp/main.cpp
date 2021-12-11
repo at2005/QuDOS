@@ -40,11 +40,10 @@ int main() {
 				compile(&(st->get_child_trees()[i]), main_table);	
 			}
 
-//			file << "add esp," << var_counter*4 << endl;	
-//			file << "ret\n";
 			file << "db 0xC0\n";
 			file << "db 0xDE\n";	
 			var_counter = 0;
+			free_reg("eax");
 		}
 
 		else compile(st, main_table);
