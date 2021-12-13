@@ -2,14 +2,29 @@
 link quant;
 link sendq;
 link execq;
+link QGATE;
 
-function a() {
-	return 5;
+int function a() {
+	asm("pushad");
+	asm("push dword 0x0");
+	asm("push dword 0x0");
+	asm("mov eax, 0xA0000000");
+	asm("call [eax]");
+	asm("add esp, 8");
+	asm("popad");
+	
+	if(2 > 1) {
+		return 12;
+	}
 
 }
 
-function main() {
+function main() {	
+	asm("some_label:");
 	H(0);
+	asm("push dword [some_label]");
+	asm("call printh");
+	asm("add esp, 4");
 	nloc a();
 	execq;
 	return;

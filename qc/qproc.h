@@ -10,6 +10,7 @@ uint32_t fetch_vpage();
 
 static klist* qlist;
 
+
 typedef struct qproc_struct {
 	// holds classical pid of parent processes
 	uint32_t cpid;
@@ -32,7 +33,6 @@ typedef struct qproc_struct {
 		
 
 } qproc_struct;
-
 
 
 

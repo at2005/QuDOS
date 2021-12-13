@@ -187,6 +187,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	// get root of AST
 	Node* root = st->getRoot();
 	
+
 	// if operator
 	if(root->getTToken() == "OPERATOR") { 
 
@@ -405,6 +406,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			
 	}
 
+	else if(root->getTValue() == "asm") {
+		if(root->getTValue() == "asm") {
+			file << st->get_function_parameters()[0].getRoot()->getTValue() << endl;
+		
+		}
+		
+
+			
+	}
 
 	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
@@ -433,11 +443,18 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "ID") opcode = "0x4";
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
-		mov_x86("byte ["+quant_reg+"]", opcode);
+		
+		file << "pushad\npush " << param << endl; 
+		file << "push " << opcode << endl;
+		file << "call QGATE\n";
+		file << "add esp, 8\npopad\n";
+
+		/*mov_x86("byte ["+quant_reg+"]", opcode);
 		file << "inc " << quant_reg << endl;
 		mov_x86("byte ["+quant_reg+"]", get_byte_reg(param));
 		file << "inc " << quant_reg << endl;	
 		free_reg(param);
+		*/
 	
 	}
 
@@ -450,7 +467,6 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 
 		else if(root->getTValue() == "nloc") {
-			cout << st->get_function_parameters().size();
 			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
 			
 			file << "pushad\npush " << func_name << endl << "call sendq\n add esp,4\npopad\n";
@@ -471,6 +487,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 	
 	}
+
+
 
 	else if(root->getTValue() == "for") {
 		

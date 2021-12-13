@@ -34,6 +34,8 @@ void strcpy(char* a, char* b) {
 
 }
 
+
+
 bool strcmp(char* a, char* b) {
 	int i = 0;
 	while(a[i] != '\0' || b[i] != '\0') {

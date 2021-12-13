@@ -4,53 +4,36 @@ link execq;
 link printh;
 link zero_buffer;
 link quant;
-
+link scanf;
 
 
 int function newline(int a) {
-	printf("\n");	
+	printf("\n");
+	return;	
 }
 
 
 
 function main() {
-        X(0);
-	H(0);
-	X(2);
-	H(3);
-	Z(2);
-	Y(1);
-	
-	nloc a();
-	#execq;
+
+	string msg = "Q++ Shell For QOS Programmed By Ayush Tambde\n";
+	printf(msg);
+	char buff[256];
+	while(1==1) {
+		printf("A> ");
+		scanf(buff);
+		printf(buff);
+                newline();
+		zero_buffer(buff, 256);		
+
+	}
 
 
-#	int var = 12;
-#	int var2 = 4;	
-#	if(var > var2) {
-#		for(int i = 10, i >= 0, i-=1) {
-#			#printh(i);
-#		
-#		}
-#
-#	
-#	
-#	}
-
-#	string msg = "Q++ Shell For QOS Programmed By Ayush Tambde\n";
-#	printf(msg);
-#	char buff[256];
-#	while(1==1) {
-#		printf("A> ");
-#		scanf(buff);
-#		printf(buff);
-#                newline();
-#		zero_buffer(buff, 256);		
-#
-#	}
-#
-#
 }
+
+
+
+
 
 
 

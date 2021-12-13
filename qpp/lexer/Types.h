@@ -43,7 +43,8 @@ struct
 	unordered_map<string, int> intrinsic_func = {
 		{"filter",1},
 		{"qft",1 },
-		{"mark",1}
+		{"mark",1},
+		{"asm",1}
 	};
 
 

@@ -44,8 +44,6 @@ public:
 
 		
 		else if (inputExpr.size() == 2 && inputExpr[0].getToken() == "KEYWORD") {
-			cout << "hello\n\n";
-			//cout << inputExpr[0].getValue();
 				
 			this->root_of_tree =  new Node(inputExpr[0], inputExpr[0].getValue());
 			vector<Pair> id = { inputExpr[1] };
@@ -262,9 +260,7 @@ private:
 	//creates AST of function call
 
 	Node* createFCallTree(vector<Pair> inputExpr) {
-		//if(inputExpr[0].getValue() == "filter") for(int i = 0; i < inputExpr.size(); i++) cout << inputExpr[i].getValue() << endl; 
 		Node* root = new Node(); 
-		//if(inputExpr[0].getValue() == "filter")  cout << "\ndone\n";			
 		*root = *(parse_maths(inputExpr));
 		root->setTreeToken("FCALL");
 		vector<vector<Pair>> tempVec = returnSep(root->get_func_params());
@@ -274,8 +270,6 @@ private:
 
 		}
 
-		//cout << this->function_parameters.size();
-		//cout << root->getTValue() << ":" << this->function_parameters.size() << endl;
 		
 		return root;
 

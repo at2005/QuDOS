@@ -8,12 +8,14 @@ global _start
 
 section .text:
 _start:
-mov eax, 1
-mov ebx, msg
-mov ecx, 0
-mov edx, 0
-int 0x80
+;mov eax, 1
+;mov ebx, msg
+;mov ecx, 0
+;mov edx, 0
+;int 0x80
 
+mov eax, 0xA0000000
+call [eax]
 
 jmp $
 

@@ -416,6 +416,7 @@ uint32_t qcall_handler(sys_args qparams) {
 		case 4:;
 		       dma_flag = 0;
 			uint8_t* func_start = (uint8_t*)(qparams.ebx);
+			print_hex(func_start);
 			int i = 0;
 			int strike = 0;
 			while(strike < 2) {
@@ -437,7 +438,6 @@ uint32_t qcall_handler(sys_args qparams) {
 			
 			dma_flag = 0;
 			uint8_t* buff_cdata = (uint8_t*)(current_proc->qproc->cdata);
-
 			qc_dma_write(buff_cdata, 256);
 			break;
 			

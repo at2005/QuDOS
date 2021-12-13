@@ -10,6 +10,7 @@ global zero_buffer
 global execq
 global sendq
 
+
 _start:
 	call main
 	jmp $	
@@ -138,4 +139,15 @@ zero_buffer:
 		
 	
 		
-	
+global QGATE
+
+QGATE:
+	mov ebx, [esp+4]
+	mov [eax], ebx
+	inc eax
+	mov ebx, [esp+8]
+	mov [eax], ebx
+	inc eax	
+	ret
+
+

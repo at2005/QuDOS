@@ -6,6 +6,7 @@
 using namespace std;
 
 
+
 int main() {
 
 	
@@ -22,12 +23,19 @@ int main() {
 	main_table->table = mtable;
 	
 	main_table->parent_table = nullptr;	
+	
+	
+	unordered_map<string, SyntaxTree*> func_table = {};
+	
 
 	
 	SyntaxTree* main_tree;
 	for(int i = 0; i < expressions.size(); i++) {
 		SyntaxTree* st = new SyntaxTree(expressions[i]);
 		if(st->get_expr_type() == "FUNCTION_DECLARATION") { 
+			
+			func_table.insert({st->getRoot()->getTValue(), st});
+
 			file << st->getRoot()->getTValue() << ":\n";
 			
 			if(st->getRoot()->getTValue() == "main") {
