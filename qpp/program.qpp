@@ -3,30 +3,29 @@ link quant;
 link sendq;
 link execq;
 link QGATE;
+link printh;
+link printf;
 
 int function a() {
+	asm("mov edi, 0xA0000000");
 	asm("pushad");
 	asm("push dword 0x0");
 	asm("push dword 0x0");
-	asm("mov eax, 0xA0000000");
-	asm("call [eax]");
+	asm("call [edi]");
 	asm("add esp, 8");
 	asm("popad");
-	
-	if(2 > 1) {
-		return 12;
-	}
 
+	Z(0);
+
+	return 2;
 }
 
+
 function main() {	
-	asm("some_label:");
 	H(0);
-	asm("push dword [some_label]");
-	asm("call printh");
-	asm("add esp, 4");
 	nloc a();
 	execq;
+	
 	return;
 
 }

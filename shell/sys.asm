@@ -142,11 +142,11 @@ zero_buffer:
 global QGATE
 
 QGATE:
-	mov ebx, [esp+4]
-	mov [eax], ebx
+	mov edi, [esp+4]
+	mov [eax], edi
 	inc eax
-	mov ebx, [esp+8]
-	mov [eax], ebx
+	mov edi, [esp+8]
+	mov [eax], edi
 	inc eax	
 	ret
 

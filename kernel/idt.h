@@ -428,9 +428,25 @@ uint32_t qcall_handler(sys_args qparams) {
 	
 			i-=2;
 			
-			memcpy((uint8_t*)func_start,(uint8_t*)(current_proc->qproc->cdata), i); 
+
+			uint8_t* cdata_buff = (uint8_t*)(current_proc->qproc->cdata);
+
+//			memcpy((uint8_t*)func_start,(uint8_t*)(current_proc->qproc->cdata), i); 
+			
+			for(int j = 0; j < i; j++) {
+				uint32_t fcall = *(uint32_t*)((uint32_t)func_start + j);
+				if(func_start[j] == 0xFF && func_start[j+1] == 0xD6) {
+					cdata_buff[j] = 0xFF;
+					cdata_buff[j+1] = 0x17;
+					j++;
+				}
+				//if( =) {print("here"); break;}
+				else cdata_buff[j] = func_start[j];
+			
+			}
 			
 			
+
 			break;
 
 

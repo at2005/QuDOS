@@ -50,6 +50,7 @@ static ofstream file("./out.asm");
 string data_section = "section .data:\n";
 string bss_section = "section .bss:\n";
 string quant_reg = "";
+string gate_reg = "";
 // structure for symbol table
 typedef struct symtab {
 	std::unordered_map<string, int> table;
@@ -444,10 +445,10 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
 		
-		file << "pushad\npush " << param << endl; 
+		file << "push " << param << endl; 
 		file << "push " << opcode << endl;
-		file << "call QGATE\n";
-		file << "add esp, 8\npopad\n";
+		file << "call " << gate_reg << endl;
+		file << "add esp, 8\n";
 
 		/*mov_x86("byte ["+quant_reg+"]", opcode);
 		file << "inc " << quant_reg << endl;

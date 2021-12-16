@@ -4,45 +4,41 @@ global main
 [extern sendq]
 [extern execq]
 [extern QGATE]
+[extern printh]
+[extern printf]
 a:
+mov edi, 0xA0000000
 pushad
 push dword 0x0
 push dword 0x0
-mov eax, 0xA0000000
-call [eax]
+call [edi]
 add esp, 8
 popad
-mov eax,2
-mov ebx,1
-cmp eax,ebx
-jle l0
-mov eax,12
-mov eax,eax
+mov eax,0
+push eax
+push 0x3
+call esi
+add esp, 8
+mov ebx,2
+mov eax,ebx
 add esp,0
 ret
-add esp,0
-l0:
 db 0xC0
 db 0xDE
 main:
 call quant
 mov eax,eax
 mov dword [__q__], eax
-some_label:
-mov ebx,0
-pushad
-push ebx
+mov esi, QGATE
+mov ecx,0
+push ecx
 push 0x0
-call QGATE
+call esi
 add esp, 8
-popad
-push dword [some_label]
-call printh
-add esp, 4
 pushad
 push a
 call sendq
-add esp,4
+ add esp,4
 popad
 mov byte [eax], 0xD
 pushad

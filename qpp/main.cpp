@@ -26,9 +26,10 @@ int main() {
 	
 	
 	unordered_map<string, SyntaxTree*> func_table = {};
-	
 
-	
+		
+gate_reg = "esi";
+
 	SyntaxTree* main_tree;
 	for(int i = 0; i < expressions.size(); i++) {
 		SyntaxTree* st = new SyntaxTree(expressions[i]);
@@ -42,6 +43,8 @@ int main() {
 				string fr = get_free_reg();
 				quant_reg = fr;
 				file << "call quant\nmov " << fr << ",eax\nmov dword [__q__], eax\n";
+//				file << "mov " << "esi" << ", QGATE\n";
+//				gate_reg = "esi";
 			}
 
 			for(int i = 0; i < st->get_child_trees().size(); i++) { 
