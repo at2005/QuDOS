@@ -30,6 +30,7 @@ int main() {
 		
 gate_reg = "esi";
 
+free_regs.ebx = 1;
 	SyntaxTree* main_tree;
 	for(int i = 0; i < expressions.size(); i++) {
 		SyntaxTree* st = new SyntaxTree(expressions[i]);
@@ -38,12 +39,14 @@ gate_reg = "esi";
 			func_table.insert({st->getRoot()->getTValue(), st});
 
 			file << st->getRoot()->getTValue() << ":\n";
-			
+
+			quant_reg = "ebx";			
+//			string fr = get_free_reg();
+//			quant_reg = fr;
+	
 			if(st->getRoot()->getTValue() == "main") {
-				string fr = get_free_reg();
-				quant_reg = fr;
-				file << "call quant\nmov " << fr << ",eax\nmov dword [__q__], eax\n";
-//				file << "mov " << "esi" << ", QGATE\n";
+			file << "mov dword [__q__]," << quant_reg << endl;
+				file << "mov " << "esi" << ", QGATE\n";
 //				gate_reg = "esi";
 			}
 

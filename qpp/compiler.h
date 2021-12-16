@@ -444,11 +444,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "ID") opcode = "0x4";
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
-		
+	
+		//file << "push ebx\npush ecx\npush edx\npush esi\npush edi\n";	
+		//file << "push " << quant_reg << endl;
 		file << "push " << param << endl; 
 		file << "push " << opcode << endl;
 		file << "call " << gate_reg << endl;
-		file << "add esp, 8\n";
+		inc_esp_x86(8);
+		//file << "pop edi\npop esi\npop edx\npop ecx\npop ebx\n";	
+
 
 		/*mov_x86("byte ["+quant_reg+"]", opcode);
 		file << "inc " << quant_reg << endl;
@@ -460,7 +464,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	}
 
 	else if(root->getTToken() == "KEYWORD") {
-		if(root->getTValue() == "execq") file << "mov byte [eax], 0xD\npushad\npush dword [__q__]\ncall execq\nadd esp, 4\npopad\n";
+		if(root->getTValue() == "execq") file << "mov byte [ebx], 0xD\npushad\npush dword [__q__]\ncall execq\nadd esp, 4\npopad\n";
 		else if (root->getTValue() == "link") {
 			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
 			file << "[extern " << func_name << "]\n";

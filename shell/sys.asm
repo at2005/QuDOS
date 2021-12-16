@@ -12,6 +12,8 @@ global sendq
 
 
 _start:
+	call quant
+	mov ebx, eax
 	call main
 	jmp $	
 
@@ -142,12 +144,13 @@ zero_buffer:
 global QGATE
 
 QGATE:
+	;mov eax, [esp+12]
 	mov edi, [esp+4]
-	mov [eax], edi
-	inc eax
+	mov [ebx], edi
+	inc ebx
 	mov edi, [esp+8]
-	mov [eax], edi
-	inc eax	
+	mov [ebx], edi
+	inc ebx	
 	ret
 
 

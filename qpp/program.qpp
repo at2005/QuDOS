@@ -8,24 +8,22 @@ link printf;
 
 int function a() {
 	asm("mov edi, 0xA0000000");
-	asm("pushad");
-	asm("push dword 0x0");
-	asm("push dword 0x0");
-	asm("call [edi]");
-	asm("add esp, 8");
-	asm("popad");
 
-	Z(0);
+	H(0);
 
-	return 2;
+
+	return 5;
 }
+
 
 
 function main() {	
 	H(0);
+	a();
 	nloc a();
 	execq;
-	
 	return;
 
 }
+
+
