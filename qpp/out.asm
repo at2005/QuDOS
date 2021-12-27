@@ -7,10 +7,28 @@ global main
 [extern quant]
 [extern scanf]
 [extern QGATE]
+[extern sendq]
 newline:
 push s0
 call printf
 add esp,4
+add esp,0
+ret
+db 0xC0
+db 0xDE
+
+
+stuff_og:
+mov eax,7
+add esp,0
+ret
+db 0xC0
+db 0xDE
+
+
+stuff:
+call stuff_og
+mov eax,4
 add esp,0
 ret
 db 0xC0
@@ -26,13 +44,11 @@ add esp,4
 push dword 0b1000000010110011001100110011010
 fld dword [esp]
 add esp,4
-
-fadd
-fstp dword [val]
-push dword [val]
-call printh
+pushad
+push stuff
+call sendq
 add esp,4
-
+popad
 push s1
 push  dword [esp+0]
 call printf
@@ -66,9 +82,10 @@ db 0xDE
 
 section .data:
 s0 db "",0xA,"",0
+msg_stuff_og db "stuff_og",0
 s1 db "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde",0xA,"For BTYSTE 2022",0xA,"This is a multi-tasking kernel with paging enabled",0xA,"Type INFO for more information",0xA,"Type HELP for a basic user guide",0xA,"",0xA,"",0
 s2 db "A> ",0
 __q__ dd 0
-val dd 0
+
 section .bss:
 num resb 256

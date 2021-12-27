@@ -19,30 +19,25 @@ int main(int argc, char** argv) {
 	free_regs = {0,0,0,0,0,0};
 	file << "section .text:\nglobal main\n";
 	
-/*	std::unordered_map<string,int> mtable = {};
-	symtab* main_table = new symtab;
-	main_table->table = mtable;
-*/	
-	
-	
-/*	std::unordered_map<string,int> table = {};
-
-	symtab* func_symtab = new symtab;
-	func_symtab->table = table;
-	func_symtab->parent_table = nullptr;	
-*/
 		
 	gate_reg = "esi";
 
-	free_regs.ebx = 1;
+	free_regs.esi = 1;
 	
 	SyntaxTree* main_tree;
 	for(int i = 0; i < expressions.size(); i++) {
 		SyntaxTree* st = new SyntaxTree(expressions[i]);
 		if(st->get_expr_type() == "FUNCTION_DECLARATION") { 
-						
+			
+			unordered_map<string, int> flocal_tab = {};			
+			rtrack(st, flocal_tab);
+			fref_table.insert({st->getRoot()->getTValue(), flocal_tab});
+	
+					
+			//for(auto& it : fref_table) cout << it.first << endl;		
+				
+
 			std::unordered_map<string,int> table = {};
-		//	std::unordered_map<string,int> table = {};
 			symtab* func_symtab = new symtab;
 			func_symtab->table = table;
 			func_symtab->var_counter = 0;

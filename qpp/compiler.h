@@ -7,6 +7,7 @@
 #include <fstream>
 #include "general/read.h"
 #include "general/BaseConversion.h"
+#include "rtrack.h"
 
 #define ADD_X86 "add"
 #define SUB_X86 "sub"
@@ -46,6 +47,8 @@ static int counter = 0;
 static int string_counter = 0;
 
 bool is_left = false;
+
+unordered_map<string, unordered_map<string, int>> fref_table = {};
 
 // file descriptor for output
 static ofstream file("./out.asm");
@@ -170,7 +173,7 @@ string get_byte_reg(string reg) {
 
 
 void mov_x86(string reg0, string reg1) {
-	file << MOV_X86 << " " << reg0 << "," << reg1 << endl;
+	if(reg0 != reg1) file << MOV_X86 << " " << reg0 << "," << reg1 << endl;
 
 }
 
@@ -202,6 +205,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		// compile children
 		is_left = true;
 		string lreg = compile(&left_tree, symbol_table);
+		is_left = true;
 		string rreg = compile(&right_tree, symbol_table);
 
 		
@@ -220,7 +224,29 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		if(root->getTValue() == "+" || root->getTValue() == "+=") op_type = ADD_X86;
 		else if(root->getTValue() == "-" || root->getTValue() == "-=") op_type = SUB_X86;
 		else if (root->getTValue() == "*" || root->getTValue() == "*=") op_type = MUL_X86;
-		else if(root->getTValue() == "/") op_type = DIV_X86;	
+	
+		else if(root->getTValue() == "/") {
+			op_type = DIV_X86;
+			int eax_free = free_regs.eax;
+			int edx_free = free_regs.edx;
+			free_regs.edx = 1;
+			free_regs.eax = 1;	
+			file << "push edx\n";
+			file << "push eax\n";
+			mov_x86("edx", "0");
+			mov_x86("eax", lreg);
+			file << op_type << " " << rreg << endl;
+			string div_res = get_free_reg();
+			mov_x86(div_res, "eax");
+			file << "pop eax\n";
+			file << "pop edx\n";
+			free_regs.eax = eax_free;
+			free_regs.edx = edx_free;
+			free_reg(rreg);
+			free_reg(lreg);
+			return div_res;
+		}
+
 		file << op_type << " " << lreg << "," << rreg << endl;
 		
 		free_reg(rreg);
@@ -387,10 +413,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			string temp(24-mts_str.size(), '0');
 			mts_str += temp;
 			mts_str[0] = '0';
-       			cout << mts_str << endl;			
 			uint32_t mantissa = to_decimal(mts_str);
 			uint32_t res = mantissa | (exp << 23) | 0x00000000;
-			cout << to_binary(res) << endl;
 					
 
 			//cout << to_binary((int)num) << " : " << to_bin_float(num) << endl;
@@ -454,7 +478,6 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
 		int vc_copy = symbol_table->var_counter;
-		cout << root->getTValue() << " : " << vc_copy << endl;
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
 			symbol_table->var_counter++;
@@ -509,7 +532,12 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "nloc") {
 			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
 			
-			file << "pushad\npush " << func_name << endl << "call sendq\n add esp,4\npopad\n";
+			for(auto& i : fref_table[func_name]) {
+				cout << i.first << endl;
+				data_section += "msg_" + i.first + " db " + "\"" + i.first + "\",0\n";
+			}
+
+			file << "pushad\npush " << func_name << endl << "call sendq\nadd esp,4\npopad\n";
 		
 		}
 

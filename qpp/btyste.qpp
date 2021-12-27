@@ -7,6 +7,19 @@ link sendq;
 link scanf;
 
 
+int function pow(int a, int exp) {
+	if(exp == 0) {
+		return 1;
+	}
+
+	for(int i = 1, i < exp, i+=1) {
+		a *= a;
+	
+	}
+
+	return a;
+}
+
 function prepare_ansatz(float theta) {
 	H(0);
 	CX(0,1);
