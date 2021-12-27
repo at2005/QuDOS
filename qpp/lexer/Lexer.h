@@ -53,10 +53,19 @@ public:
 
 				//operator checks
 				else if (isOperator(tempString) || isCompOp(tempString) || isAssignment(tempString)) {
+					
 					char nextStr;
 					if (line.size() > i + 1) {
 						nextStr = line[i + 1];
 					}
+					
+
+					/*if(tempString == "-" && !isIdentifier(proxy) && !isNumeric(proxy)) {
+						if(proxy != "") outputLex.add(proxy, getToken(proxy));
+						proxy = "-";
+					
+					}*/
+
 
 					else {
 						nextStr = '\0'; 

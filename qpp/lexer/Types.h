@@ -22,7 +22,8 @@ struct
 		{"return", 1},
 		{"execq",1},
 		{"link", 1},
-		{"nloc", 1}
+		{"nloc", 1},
+		{"async", 1}
 	};
 
 
@@ -68,7 +69,8 @@ struct
 		{"Z",1},
 		{"ID",1},
 		{"SWAP",1},
-		{"CCX",1}
+		{"CCX",1},
+		{"MEASURE",1}
 	};
 
 	unordered_map<string, int> func_decl = {

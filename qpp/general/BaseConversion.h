@@ -61,7 +61,7 @@ unsigned long long to_decimal(string bitstring) {
 
 	// iterate over each power of 2 in reverse, e.g. 2^(n-1), 2^(n-2) ... 2^(0)
 	for (int power_of_two = bitstring.size() - 1; power_of_two > -1; power_of_two--) {
-		decimal += (int)bitstring[i] * pow(2, power_of_two);
+		decimal += (bitstring[i] - '0') * pow(2, power_of_two);
 		// increment iterator for bitstring. Therefore, as we are moving forward in our 
 		//bitstring we can decrement our indices
 		i++;
@@ -70,4 +70,29 @@ unsigned long long to_decimal(string bitstring) {
 	// return decimal value
 	return decimal;
 }
+
+
+// float to binary float
+string to_bin_float(float base_10) {
+	base_10 -= (int)base_10;
+	string res = "";
+	while(1) {
+		if(base_10 == 0) break;
+		base_10 *= 2;
+		if(base_10 < 1.00000) {
+			res += '0';
+			continue;
+
+		}
+
+		base_10 -= 1;
+		res += '1';
+
+
+	}
+
+	return res;
+
+}
+
 

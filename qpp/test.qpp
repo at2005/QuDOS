@@ -5,9 +5,9 @@ link printh;
 link zero_buffer;
 link quant;
 link scanf;
+link QGATE;
 
-
-int function newline(int a) {
+int function newline() {
 	printf("\n");
 	return;	
 }
@@ -15,8 +15,9 @@ int function newline(int a) {
 
 
 function main() {
-
-	string msg = "Q++ Shell For QOS Programmed By Ayush Tambde\n";
+	float var = 12.5;
+	float var2 = 3.4;
+	string msg = "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde\nFor BTYSTE 2022\nThis is a multi-tasking kernel with paging enabled\nType INFO for more information\nType HELP for a basic user guide\n\n";
 	printf(msg);
 	char buff[256];
 	while(1==1) {
@@ -27,6 +28,8 @@ function main() {
 		zero_buffer(buff, 256);		
 
 	}
+
+	return;
 
 
 }

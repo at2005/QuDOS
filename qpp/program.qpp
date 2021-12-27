@@ -8,10 +8,7 @@ link printf;
 
 int function a() {
 	asm("mov edi, 0xA0000000");
-
 	H(0);
-
-
 	return 5;
 }
 

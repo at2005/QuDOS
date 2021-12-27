@@ -212,7 +212,7 @@ private:
 			string array_size = "";
 			for(int i = 0; i < array.size(); i++) array_size += array[i].getValue();
 			
-			root->setPurpose("h");
+//			root->setPurpose("h");
 			if(array_size.size() != 0) root->setPurpose(array_size);
 			vector<Pair> tempVec = {};
 			int index = 0;

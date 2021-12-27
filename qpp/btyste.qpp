@@ -1,0 +1,144 @@
+
+link printf;
+link printh;
+link execq;
+link QGATE;
+link sendq;
+link scanf;
+
+
+function prepare_ansatz(float theta) {
+	H(0);
+	CX(0,1);
+	RX(theta, 0);
+	return;
+
+}
+
+
+
+int function measure_basis(int mtype) {
+	int res = 0;
+	if(mtype == 0) {
+            CX(0,1);
+	    MEASURE(1, res);
+            return res;
+	}
+
+        if(mtype == 1) {
+            H(0);
+            H(1):
+            CX(0,1);
+            MEASURE(1, res);
+            return res;
+        }
+
+        if(mtype == 2) {
+            SDG(0);
+            SDG(1);
+            H(0);
+            H(1);
+       	    CX(0,1);
+            MEASURE(1, res);
+            return res;
+            
+        }
+
+}
+
+
+
+
+
+function vqe() {
+	
+        float param = 0.5;
+   	 
+	for(int i = 0, i < 4096, i+=1) {
+                int x_ev = 0;
+                int y_ev = 0;
+                int z_ev = 0;
+                
+
+                for(int j = 0, j < 100, j+=1) {
+                    prepare_ansatz();
+                    x_ev +=  pow(-1, measure_basis(1));
+                    prepare_ansatz();	
+                    y_ev += pow(-1, measure_basis(2));
+                    prepare_ansatz();
+                    z_ev += pow(-1, measure_basis(0));
+
+                }
+
+                float true_ev = 0.5 * (1+x_ev - y_ev - z_ev);
+		param = optimize(true_ev);
+
+
+	}
+		
+    
+    	return;
+}
+
+
+
+function do_while_waiting() {
+        # do something
+	return;
+
+}
+
+function main() {
+	printf("Please enter name of program: ");
+	char buff[256];
+	scanf(buff);
+        
+        if(strcmp(buff,"1")) {         
+            nloc vqe();
+            async do_while_waiting();
+            
+        }
+
+       	return;
+	
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+float function optimize(float mean) {
+        return mean+2;
+
+}

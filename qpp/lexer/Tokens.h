@@ -98,7 +98,8 @@ bool isIdentifier(std::string input) {
 	int counter = 0;
 	std::string temp = "";
 	for (unsigned int j = 0; j < input.size(); j++) {
-		string s = ""; s += input[j];
+		string s = "";
+	        s += input[j];
 		if (isNumeric(s)) {
 			if (is_alpha) counter++;
 		}
@@ -124,7 +125,7 @@ bool isNumeric(std::string input) {
 	if (input == "pi") return true;
 	int counter = 0;
 	for (unsigned int i = 0; i <= input.size(); i++) {
-		if(lex_states.digit.find(input[i]) != lex_states.digit.end()) {
+		if(lex_states.digit.find(input[i]) != lex_states.digit.end() || input[0] == '-' || input[i] == '.') {
 			counter++;
 		}
 

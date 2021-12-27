@@ -6,6 +6,7 @@
 #include "parser/SyntaxTree.h"
 #include <fstream>
 #include "general/read.h"
+#include "general/BaseConversion.h"
 
 #define ADD_X86 "add"
 #define SUB_X86 "sub"
@@ -40,9 +41,11 @@ static int jmp_flag = 0;
 // label counter
 static int counter = 0;
 // variable counter
-static int var_counter = 0;
+//static int symbol_table->var_counter = 0;
 // count number of strings
 static int string_counter = 0;
+
+bool is_left = false;
 
 // file descriptor for output
 static ofstream file("./out.asm");
@@ -54,7 +57,8 @@ string gate_reg = "";
 // structure for symbol table
 typedef struct symtab {
 	std::unordered_map<string, int> table;
-	struct symtab* parent_table; 
+	struct symtab* parent_table;
+	int var_counter;
 
 } symtab;
 
@@ -178,7 +182,7 @@ void cmp_x86(string reg0, string reg1) {
 
 
 void inc_esp_x86(unsigned int size) {
-	file << "add esp," << size << endl;
+	if(size != 0)  file << "add esp," << size << endl;
 
 }
 
@@ -196,6 +200,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 		
 		// compile children
+		is_left = true;
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
 
@@ -229,7 +234,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	else if(root->getTToken() == "COMPARISON_OPERATOR") {
 		SyntaxTree left_tree = SyntaxTree(root->getLeftChild());
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
-
+	
+		is_left = true;
 		string lreg = compile(&left_tree, symbol_table);
 		string rreg = compile(&right_tree, symbol_table);
 		
@@ -246,7 +252,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		
 		// free left register
 		if(root->getLeftChild()->getTToken() == "IDENTIFIER") free_reg(rreg);
-
+		
 		
 		string cmp_type = "";
 		
@@ -293,7 +299,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 		free_reg(lreg);
 		free_reg(rreg);	
-		string label = "l" + to_string(counter);	
+		string label = "l" + to_string(counter);
+		cout << "label: " << label << endl;	
 		counter++;
 		file << cmp_type << " " << label << endl;
 		return label;			
@@ -302,15 +309,21 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 
 	else if(root->getTToken() == "NUMBER") {
-		string val = root->getTValue();
-		string freg = get_free_reg();
-		mov_x86(freg, val);
-		return freg;
+		
+		if(is_left) {
+			string val = root->getTValue();
+			string freg = get_free_reg();
+			mov_x86(freg, val);
+			is_left = false;
+			return freg;
+		}
+
+		return root->getTValue();
 	}		
 
 	else if(root->getTToken() == "IDENTIFIER") {
 		int pos = search_symtab(symbol_table, root->getTValue());
-		string offset =  to_string(4*(var_counter - (pos + 1)));	
+		string offset =  to_string(4*(symbol_table->var_counter - (pos + 1)));	
 		string val = " dword [esp+" + (offset) + "]";
 		if(root->is_classical()) {
 			string reg = get_free_reg();
@@ -357,16 +370,36 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	else if(root->getTToken() == "ASSIGNMENT") {
 		string var_name = root->getLeftChild()->getTValue();
-		symbol_table->table.insert({var_name, var_counter});
+		symbol_table->table.insert({var_name, symbol_table->var_counter});
 		
 		if(isNumeric(root->getPurpose())) {
 			bss_section += "num resb 256\n";	
 			file << "push num\n";
-			var_counter++;
+			symbol_table->var_counter++;
 			return "num";	
 		}
 
+		
+		if(root->getLeftChild()->getPurpose() == "float") {
+			float num = stof(root->getRightChild()->getTValue());
+			uint32_t exp = to_binary((int)num).size() + 126;
+			string mts_str = to_binary((int)num) + to_bin_float(num);
+			string temp(24-mts_str.size(), '0');
+			mts_str += temp;
+			mts_str[0] = '0';
+       			cout << mts_str << endl;			
+			uint32_t mantissa = to_decimal(mts_str);
+			uint32_t res = mantissa | (exp << 23) | 0x00000000;
+			cout << to_binary(res) << endl;
+					
 
+			//cout << to_binary((int)num) << " : " << to_bin_float(num) << endl;
+			file << "push dword 0b" << to_binary(res) << endl;
+			file << "fld dword [esp]" << endl;
+			inc_esp_x86(4);	
+			return "st0";
+		
+		}
 
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 		string res = compile(&right_tree, symbol_table);
@@ -374,7 +407,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		
 		file << "push " << res << endl;
 		free_reg(res);
-		var_counter++;
+		symbol_table->var_counter++;
 		return res;
 	
 	}
@@ -384,7 +417,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		symtab* scope_table = new symtab;
 		scope_table->table = {};
 		scope_table->parent_table = symbol_table;
-	
+		scope_table->var_counter = symbol_table->var_counter;
+
 		jmp_flag = 1;
 		SyntaxTree cond_tree = SyntaxTree(root->getLeftChild());
 		string lbl = compile(&cond_tree, symbol_table);	
@@ -398,7 +432,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 
 		inc_esp_x86(scope_table->table.size()*4);
-		var_counter -= scope_table->table.size();
+		symbol_table->var_counter -= scope_table->table.size();
 				
 		delete scope_table;
 		file << lbl  << ":\n";
@@ -419,15 +453,16 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
-		int vc_copy = var_counter;
+		int vc_copy = symbol_table->var_counter;
+		cout << root->getTValue() << " : " << vc_copy << endl;
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
-			var_counter++;
+			symbol_table->var_counter++;
 			file << "push " << param << endl;
 			free_reg(param);
 		}
 
-		var_counter = vc_copy;
+		symbol_table->var_counter = vc_copy;
 
 		file << "call " << root->getTValue() << endl;
 		inc_esp_x86(func_params.size() * 4);
@@ -486,7 +521,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 			}
 
-			file << "add esp," << var_counter*4 << endl;	
+			file << "add esp," << symbol_table->var_counter*4 << endl;
+				
 			file << "ret\n";
 
 		}
@@ -500,6 +536,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		symtab* loop_scope = new symtab;
 		loop_scope->table = {};
 		loop_scope->parent_table = symbol_table;	
+		loop_scope->var_counter = symbol_table->var_counter;
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		compile(&(func_params[0]), symbol_table);
 		string jmp_label =  "l" + to_string(counter);
@@ -532,6 +569,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		symtab* loop_scope = new symtab;
 		loop_scope->parent_table = symbol_table;
 		loop_scope->table = {};
+		loop_scope->var_counter = symbol_table->var_counter;
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		jmp_flag = 1;
 		string jmp_label = "l" + to_string(counter);
@@ -547,7 +585,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 		
 		file << "jmp " << jmp_label << endl;
-		
+	
 		file << break_label << ":\n";
 		
 		delete loop_scope;
