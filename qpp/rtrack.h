@@ -4,7 +4,7 @@
 
 void rtrack(SyntaxTree* func, unordered_map<string, int>& local_tab) {
 	
-	if(func->getRoot()->getTToken() == "FCALL") {
+	if(func->getRoot()->getTToken() == "FCALL" && !isAssembly(func->getRoot()->getTValue()) && !isBuiltInFunction(func->getRoot()->getTValue())) {
 		local_tab.insert({func->getRoot()->getTValue(), 1});
 		return;
 

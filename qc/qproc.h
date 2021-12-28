@@ -11,28 +11,32 @@ uint32_t fetch_vpage();
 static klist* qlist;
 
 
+typedef struct func_table {
+	char* fname;
+	uint32_t addr;	
+
+
+} func_table;
+
+
 typedef struct qproc_struct {
 	// holds classical pid of parent processes
 	uint32_t cpid;
 	// holds pid of quantum process
 	uint32_t qpid;
-	// header for classical data
-	uint8_t* cdata_header;
-	// size of header
-	uint32_t cheadsz;
 	// classical data pointer
 	uint8_t* cdata;
-	// size of classical data
-	uint32_t cdatasz;
+	// cdata offset
+	uint32_t coffset;
+	klist* cfunc_list;
 	// classical data corresponding to quantum instructions
 	uint8_t* qdata;
-	// size of quantum data
-	uint32_t qdatasz;
 	// current state
 	QSTATE state;
 		
 
 } qproc_struct;
+
 
 
 
@@ -48,10 +52,10 @@ qproc_struct* create_qproc() {
 	// allocate/fetch page for quantum data
 	new_qproc->cdata = (uint8_t*)fetch_vpage();
 	new_qproc->qdata = (uint8_t*)fetch_vpage();
-	// set size
-	new_qproc->qdatasz = 1;
+	new_qproc->coffset = 0;
 	// init state
 	new_qproc->state = DORMANT;
+	new_qproc->cfunc_list = create_klist();
 	// add to doubly linked list
 	add_klist(qlist, (uint32_t)new_qproc);
 	// return process

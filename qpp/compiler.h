@@ -532,12 +532,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "nloc") {
 			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
 			
+			data_section += "msg_" + func_name + " db " + "\"" + func_name + "\",0\n";
+			string temp = "msg_" + func_name;
+			
 			for(auto& i : fref_table[func_name]) {
 				cout << i.first << endl;
 				data_section += "msg_" + i.first + " db " + "\"" + i.first + "\",0\n";
 			}
 
-			file << "pushad\npush " << func_name << endl << "call sendq\nadd esp,4\npopad\n";
+			file << "pushad\npush " << temp << endl << "push " << func_name << endl << "call sendq\nadd esp,8\npopad\n";
 		
 		}
 

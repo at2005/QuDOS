@@ -6,7 +6,7 @@ link QGATE;
 link printh;
 link printf;
 
-int function a() {
+int function stuff() {
 	asm("mov edi, 0xA0000000");
 	H(0);
 	return 5;
@@ -16,8 +16,8 @@ int function a() {
 
 function main() {	
 	H(0);
-	a();
-	nloc a();
+#	stuff();
+	nloc stuff();
 	execq;
 	return;
 

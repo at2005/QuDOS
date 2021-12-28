@@ -118,7 +118,7 @@ run:
 sendq:
 	mov eax, 4
 	mov ebx, [esp+4]
-	mov ecx, 0
+	mov ecx, [esp+8]
 	mov edx, 0
 	int 0x40
 	
