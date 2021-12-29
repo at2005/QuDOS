@@ -535,13 +535,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			data_section += "msg_" + func_name + " db " + "\"" + func_name + "\",0\n";
 			string temp = "msg_" + func_name;
 			
+			file << "pushad\npush " << temp << endl << "push " << func_name << endl << "call sendq\nadd esp,8\npopad\n";
+			
 			for(auto& i : fref_table[func_name]) {
-				cout << i.first << endl;
+				//cout << i.first << endl;
+				file << "pushad\npush " << "msg_" + i.first << endl << "push " << i.first << endl << "call sendq\nadd esp,8\npopad\n";
 				data_section += "msg_" + i.first + " db " + "\"" + i.first + "\",0\n";
 			}
 
-			file << "pushad\npush " << temp << endl << "push " << func_name << endl << "call sendq\nadd esp,8\npopad\n";
-		
+
 		}
 
 		else if(root->getTValue() == "return") {
@@ -552,7 +554,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 			}
 
-			file << "add esp," << symbol_table->var_counter*4 << endl;
+			inc_esp_x86(symbol_table->var_counter*4);
 				
 			file << "ret\n";
 

@@ -14,7 +14,7 @@ gcc -Wall -ffreestanding -fno-pie -m32 -c shell/shell.c -o shell/shell.o
 #ld shell/sys.o shell/shell.o -o shell/shell.bin -melf_i386
 
 cd qpp
-#make
+make
 cd -
 
  if=test2.bin of=harddisk.img bs=1 count=8192 seek=4096x6 conv=notrunc
@@ -43,7 +43,7 @@ dd if=osimage.img of=drive.img conv=notrunc seek=0
 cp drive.img iso/
 genisoimage -quiet -V "MYOS" -input-charset iso8859-1 -o osimage.iso -b drive.img -hide drive.img iso/
 
-../qemu-custom/QEMU-Quantum-PCI-Device/qemu/build/i386-softmmu/qemu-system-i386 -fda drive.img -hda harddisk.img -m 1000M --device qc  
+../qemu-custom/qemu/build/i386-softmmu/qemu-system-i386 -fda drive.img -hda harddisk.img -m 1000M --device qc  
 
 rm osimage.img
 rm  memory/*.o

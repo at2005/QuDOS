@@ -386,19 +386,29 @@ void initialize_idt() {
 
 uint32_t fetch_vpage();
 
-void write_metadata(klist* ftable_array, func_table** cbuff) {
+
+
+
+void write_metadata(klist* ftable_array, func_table* cbuff) {
 	klist* copy = ftable_array;
 	ftable_array = ftable_array->next;
 
+	int i = 0;
 	while(1) {
 		if(ftable_array == copy) break;
+		print("hey\n");
 		func_table* ft = (func_table*)(ftable_array->ptr);
-		print(ft->fname);
+		strcpy(ft->fname, cbuff[i].fname);
+		cbuff[i].addr = ft->addr;
 		ftable_array = ftable_array->next;
 	
-
 	}
 
+
+	for(int i = 0; i < 10; i++) {
+		print_hex(cbuff[i].fname);
+	
+	}
 
 }
 
@@ -450,31 +460,31 @@ uint32_t qcall_handler(sys_args qparams) {
 			
 			// get classical data buffer start offset by current size
 			uint8_t* cdata_buff = (uint8_t*)((uint32_t)(current_proc->qproc->cdata) + current_proc->qproc->coffset);
-		
 			func_table* new_entry = (func_table*)kmalloc(sizeof(func_table));
-			new_entry->fname = func_name;
-			new_entry->addr = func_start;
-			print(func_name);	
+			strcpy(func_name, new_entry->fname);
+			new_entry->addr = (uint32_t)func_start;
+			print_hex(func_start);
+			print_hex(*(uint8_t*)0x0804A000);
 			add_klist(current_proc->qproc->cfunc_list, (uint32_t)new_entry);
-
+				
 			for(int j = 0; j < i; j++) {
 				//uint32_t fcall = *(uint32_t*)((uint32_t)func_start + j);
-				
 				// replace 0xFFD6 with 0xFF17 for quantum gate call
-				if(func_start[j] == 0xFF && func_start[j+1] == 0xD6) {
+				print_hex(func_start[j]);
+		/*		if(func_start[j] == 0xFF && func_start[j+1] == 0xD6) {
 					cdata_buff[j] = 0xFF;
-					cdata_buff[j+1] = 0x17;
+					cdata_buff[j+1] = 0xD7;
 					j++;
 				}
 				
 				// transfer code to cdata buffer
-				else cdata_buff[j] = func_start[j];
-			
-				// increment offset
-				current_proc->qproc->coffset++;
-			}
+				else*/ cdata_buff[j] = func_start[j];
 		
-				
+			}
+	
+			// increment offset
+			current_proc->qproc->coffset += i;
+
 			break;
 
 
@@ -482,8 +492,26 @@ uint32_t qcall_handler(sys_args qparams) {
 					
 			dma_flag = 0;
 			uint8_t* buff_cdata = (uint8_t*)(current_proc->qproc->cdata);
-			write_metadata(current_proc->qproc->cfunc_list, buff_cdata);
-			qc_dma_write(buff_cdata, 256);
+			
+			/*func_header fh;
+			fh.id[0] = 'Q';
+			fh.id[1] = 'A';
+			fh.id[2] = 'C';
+			fh.id[3] = 'I';
+			fh.id[4] = '\0';
+			
+			fh.num_func = 1;
+			fh.offset = current_proc->qproc->coffset;
+
+			*(func_header*)buff_cdata = fh;
+				
+
+			write_metadata(current_proc->qproc->cfunc_list, (func_table*)((uint32_t)buff_cdata + current_proc->qproc->coffset));
+			
+			func_table* t1 = (func_table*)((uint32_t)buff_cdata + current_proc->qproc->coffset);
+			print_hex(t1[0].addr);
+*/
+			qc_dma_write(buff_cdata, 512);
 			break;
 			
 

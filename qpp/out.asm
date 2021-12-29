@@ -7,13 +7,12 @@ global main
 [extern printh]
 [extern printf]
 stuff:
-mov edi, 0xA0000000
+mov esi, [0xA0000000]
 push 0
 push 0x0
 call esi
 add esp,8
 mov eax,5
-add esp,0
 ret
 db 0xC0
 db 0xDE
@@ -38,7 +37,6 @@ push dword [__q__]
 call execq
 add esp, 4
 popad
-add esp,0
 ret
 db 0xC0
 db 0xDE

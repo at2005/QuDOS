@@ -78,7 +78,7 @@ execq:
 	; poll until IRQ fires
 	call poll
 
-	
+	; send classical data via DMA	
 	mov eax, 5
 	mov ebx, 0
 	mov ecx, 0
