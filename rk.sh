@@ -17,7 +17,7 @@ cd qpp
 #make
 cd -
 
-dd if=test2.bin of=harddisk.img bs=1 count=8192 seek=4096x6 conv=notrunc
+ if=test2.bin of=harddisk.img bs=1 count=8192 seek=4096x6 conv=notrunc
 dd if=qpp/out.bin of=harddisk.img bs=1 count=9000 seek=4096x8 conv=notrunc
 #dd if=shell/shell.bin of=harddisk.img bs=1 count=9000 seek=4096x8 conv=notrunc
 gcc -ffreestanding -m32 -fno-pie -c kernel/kernel.c -o kernel/kernel.o
