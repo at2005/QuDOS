@@ -8,10 +8,9 @@ link printf;
 
 
 
-
 int function stuff() {
+	asm("mov edi, 0xA0000000");
 #	og_stuff();
-	asm("mov esi, [0xA0000000]");
 	H(0);
 	return 5;
 }

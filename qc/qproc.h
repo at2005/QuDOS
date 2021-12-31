@@ -21,6 +21,8 @@ typedef struct func_header {
 
 typedef struct func_table {
 	char fname[32];
+	uint32_t offset;
+	uint32_t size;
 	uint32_t addr;	
 
 

@@ -75,15 +75,16 @@ function vqe() {
 
                 for(int j = 0, j < 100, j+=1) {
                     prepare_ansatz();
-                    x_ev +=  pow(-1, measure_basis(1));
+                    x_ev +=  pow(0-1, measure_basis(1));
                     prepare_ansatz();	
-                    y_ev += pow(-1, measure_basis(2));
+                    y_ev += pow(0-1, measure_basis(2));
                     prepare_ansatz();
-                    z_ev += pow(-1, measure_basis(0));
+                    z_ev += pow(0-1, measure_basis(0));
 
                 }
 
-                float true_ev = 0.5 * (1+x_ev - y_ev - z_ev);
+                float true_ev = 0.5;
+		true_ev *= (1+x_ev - y_ev - z_ev);
 		param = optimize(true_ev);
 
 

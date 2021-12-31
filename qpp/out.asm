@@ -7,11 +7,11 @@ global main
 [extern printh]
 [extern printf]
 stuff:
-mov esi, [0xA0000000]
-push 0
-push 0x0
-call esi
-add esp,8
+mov edi, 0xA0000000
+;push 0
+;push 0
+;call esi
+;add esp 8
 mov eax,5
 ret
 db 0xC0
