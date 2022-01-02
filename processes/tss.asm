@@ -66,7 +66,8 @@ enter_user_mode:
 	mov fs, ax
 	
 	; set up stack so iret exits into user mode
-	mov ebx, 0x09000FE6
+	mov ebx, [esp+4]
+	add ebx, 0xFE6
 	; data segment descriptor
 	push 0x23
 	; stack

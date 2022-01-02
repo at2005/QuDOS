@@ -131,6 +131,7 @@ string get_free_reg() {
 		free_regs.edi = 1;
 	       	return "edi";
 	}
+
 	return "NONE_FREE";
 
 }
@@ -189,6 +190,15 @@ void inc_esp_x86(unsigned int size) {
 
 }
 
+void call_x86(string func_name) {
+	file << "call " << func_name << endl;
+
+}
+
+void push_x86(string val, string type) {
+	file << "push " << type << " " << val << endl;
+
+}
 
 
 string compile(SyntaxTree* st, symtab* symbol_table ) {
@@ -500,24 +510,22 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "Y") opcode = "0x2";
 		else if(root->getTValue() == "Z") opcode = "0x3";
 		else if(root->getTValue() == "ID") opcode = "0x4";
+		else if(root->getTValue() == "CX") opcode = "0x5";
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
-	
+		string opt = "0";
+		if(func_params.size() == 2) opt = compile(&(func_params[1]), symbol_table);
+
 		//file << "push ebx\npush ecx\npush edx\npush esi\npush edi\n";	
 		//file << "push " << quant_reg << endl;
+		file << "push " << opt << endl;
 		file << "push " << param << endl; 
 		file << "push " << opcode << endl;
 		file << "call " << gate_reg << endl;
-		inc_esp_x86(8);
+		inc_esp_x86(12);
 		//file << "pop edi\npop esi\npop edx\npop ecx\npop ebx\n";	
 
-
-		/*mov_x86("byte ["+quant_reg+"]", opcode);
-		file << "inc " << quant_reg << endl;
-		mov_x86("byte ["+quant_reg+"]", get_byte_reg(param));
-		file << "inc " << quant_reg << endl;	
-		free_reg(param);
-		*/
+		
 	
 	}
 
@@ -542,6 +550,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 				file << "pushad\npush " << "msg_" + i.first << endl << "push " << i.first << endl << "call sendq\nadd esp,8\npopad\n";
 				data_section += "msg_" + i.first + " db " + "\"" + i.first + "\",0\n";
 			}
+
+			mov_x86("[ebx]", "byte 0xA");
+			file << "inc ebx\n";	
+			push_x86(temp, "dword");
+			push_x86("ebx", "dword");
+			call_x86("strcpy");
+			mov_x86("ebx", "eax");
+			inc_esp_x86(8);
+
 
 
 		}

@@ -9,7 +9,7 @@ global quant
 global zero_buffer
 global execq
 global sendq
-
+global strcpy
 
 _start:
 	call quant
@@ -55,6 +55,42 @@ scanf:
 		
 		
 	ret
+
+
+strcpy:
+	push edi
+	push esi
+	push edx
+	push ecx
+	push ebx
+	
+	mov ebx, 0
+	; edx holds what we are copying to
+	mov edx, [esp+24]
+
+	; eax holds what we are copying from
+	mov eax, [esp+28]
+
+
+	lp:
+		mov bl, [eax]
+		mov [edx], bl
+		inc eax
+		inc edx
+		cmp bl, 0
+		jne lp
+
+	mov eax, edx	
+
+	pop ebx
+	pop ecx
+	pop edx
+	pop esi
+	pop edi
+	ret
+		
+			
+
 
 
 quant:
@@ -144,13 +180,15 @@ zero_buffer:
 global QGATE
 
 QGATE:
-	;mov eax, [esp+12]
 	mov edi, [esp+4]
 	mov [ebx], edi
 	inc ebx
 	mov edi, [esp+8]
-	mov [ebx], edi
+	mov [ebx],edi
 	inc ebx	
+	mov edi, [esp+12]
+	mov [ebx], edi
+	inc ebx
 	ret
 
 

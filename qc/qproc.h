@@ -62,7 +62,7 @@ qproc_struct* create_qproc() {
 	// allocate/fetch page for quantum data
 	new_qproc->cdata = (uint8_t*)fetch_vpage();
 	new_qproc->qdata = (uint8_t*)fetch_vpage();
-	new_qproc->coffset = 0;//sizeof(func_header);
+	new_qproc->coffset = sizeof(func_header);
 	// init state
 	new_qproc->state = DORMANT;
 	new_qproc->cfunc_list = create_klist();

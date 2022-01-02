@@ -5,22 +5,35 @@ link execq;
 link QGATE;
 link printh;
 link printf;
+link strcpy;
 
+function do_stuff() {
+	H(0);
+	return;
 
+}
+
+int function og_stuff() {
+	return 9;
+
+}
 
 int function stuff() {
 	asm("mov edi, 0xA0000000");
-#	og_stuff();
-	H(0);
+	og_stuff();
+	int test = 8;
+	if(test < 7) {
+		CX(0,1);
+	}
+
 	return 5;
 }
 
 
-
 function main() {	
 	H(0);
-#	stuff();
 	nloc stuff();
+#	nloc do_stuff();
 	execq;
 	return;
 

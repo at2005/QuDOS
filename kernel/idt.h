@@ -465,14 +465,14 @@ uint32_t qcall_handler(sys_args qparams) {
 			
 			fhead->num_func++;
 		//	print_hex(fhead->num_func);
-/*			func_table* new_entry = (func_table*)kmalloc(sizeof(func_table));
+			func_table* new_entry = (func_table*)kmalloc(sizeof(func_table));
 			strcpy(func_name, new_entry->fname);
 			new_entry->addr = (uint32_t)func_start;
 			new_entry->offset = current_proc->qproc->coffset;
 			new_entry->size = i;
 			
 			add_klist(current_proc->qproc->cfunc_list, (uint32_t)new_entry);
-*/				
+				
 
 			for(int j = 0; j < i; j++) {
 				//uint32_t fcall = *(uint32_t*)((uint32_t)func_start + j);
@@ -498,7 +498,7 @@ uint32_t qcall_handler(sys_args qparams) {
 					
 			dma_flag = 0;
 			uint8_t* buff_cdata = (uint8_t*)(current_proc->qproc->cdata);
-/*				
+				
 			func_header* fh = (func_header*)buff_cdata;
 			fh->id[0] = 'Q';
 			fh->id[1] = 'A';
@@ -509,8 +509,8 @@ uint32_t qcall_handler(sys_args qparams) {
 			//fh->num_func = 1;
 			fh->offset = current_proc->qproc->coffset;
 
-//			write_metadata(current_proc->qproc->cfunc_list, (func_table*)((uint32_t)buff_cdata + current_proc->qproc->coffset));
-*/			
+			write_metadata(current_proc->qproc->cfunc_list, (func_table*)((uint32_t)buff_cdata + current_proc->qproc->coffset));
+			
 	//		func_table* t1 = (func_table*)((uint32_t)buff_cdata + current_proc->qproc->coffset);
 	//		print(t1[1].fname);
 

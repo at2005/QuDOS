@@ -13,23 +13,9 @@ function newline() {
 	return;	
 }
 
-int function stuff_og() {
-	return 7;
-
-}
-
-int function stuff() {
-	stuff_og();
-	return 4;
-
-}
 
 
 function main() {
-	float var = 12.5;
-	float var2 = 3.4;
-	
-	nloc stuff();
 	
 	
 string msg = "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde\nFor BTYSTE 2022\nThis is a multi-tasking kernel with paging enabled\nType INFO for more information\nType HELP for a basic user guide\n\n";
