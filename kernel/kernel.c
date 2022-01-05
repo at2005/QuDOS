@@ -54,7 +54,14 @@ void main() {
 	block_read(8, buff);
 	block_read(9, (uint16_t*)((int)buff + 0x1000));
 	block_read(10, (uint16_t*)((int)buff + 0x2000));
-	
+
+
+/*	uint16_t* buff_proc2 = (uint16_t*)kmalloc(4096*3);
+	block_read(12,buff_proc2);
+	block_read(13, (uint16_t*)((int)buff_proc2 + 0x1000));
+	block_read(14, (uint16_t*)((int)buff_proc2 + 0x2000));
+
+*/
 	// initialize root process	
 	process_struct* rproc = init_proc();
 	
@@ -80,30 +87,17 @@ void main() {
 	pstack_init->proc_ip = new_proc->eip;
 	current_proc = new_proc;
 
+//	process_struct* new_proc2 = readelf((uint8_t*)buff_proc2);
+	
+//	for(int i = 0; i < 10; i++) print_hex(buff_proc2[i]);
+
+	//uint32_t* stack_bottom2 = get_page();
+	//map_identity(stack_bottom2);
+	
 	
 	map_identity(0xFEA00000);
 	map_identity(0xFEA40000);
-
-	uint8_t* dma = (uint8_t*)kmalloc(100);
 	
-	for(int i = 0; i < 100; i++) dma[i] = 10;
-		
-	
-//	print_hex(buff_dma[0]);		
-
-	//uint8_t* buff_dma = (uint8_t*)kmalloc(100);	
-	//qc_dma_write(dma, 100);
-	//while(!dma_flag);
-	//dma_flag = 0;
-
-	//mmio_write32(0x1, QC_BASE, 0x08);
-	
-	/*	qc_dma_read(buff_dma, 100);
-	while(!dma_flag);
-	dma_flag = 0;
-	//for(int i = 0; i < 21; i++) print_hex(buff_dma[i]);
-*/
-
 //	fork(new_proc);
 
 	start_timer = 1;

@@ -1,136 +1,72 @@
 section .text:
 global main
-[extern QGATE]
+[extern print]
 [extern qrun]
-apply_oracle:
-push 0
-push 1
-push 0x0
-call esi
-add esp,12
-push 1
-push 0
-push 0x5
-call esi
-add esp,12
-push 0
-push 1
-push 0x0
-call esi
-add esp,12
-ret
-db 0xC0
-db 0xDE
-
-
-diffuse:
-push 0
-push 0
-push 0x0
-call esi
-add esp,12
-push 0
-push 1
-push 0x0
-call esi
-add esp,12
-push 0
-push 0
-push 0x1
-call esi
-add esp,12
-push 0
-push 1
-push 0x1
-call esi
-add esp,12
-push 0
-push 1
-push 0x0
-call esi
-add esp,12
-push 1
-push 0
-push 0x5
-call esi
-add esp,12
-push 0
-push 1
-push 0x0
-call esi
-add esp,12
-push 0
-push 1
-push 0x1
-call esi
-add esp,12
-push 0
-push 0
-push 0x1
-call esi
-add esp,12
-push 0
-push 1
-push 0x0
-call esi
-add esp,12
-push 0
-push 0
-push 0x0
-call esi
-add esp,12
-ret
-db 0xC0
-db 0xDE
-
-
+[extern printh]
+[extern zero_buffer]
+[extern quant]
+[extern input]
+[extern QGATE]
+[extern sendq]
 main:
 mov dword [__q__],ebx
 mov esi, QGATE
-push 0
-push 0
-push 0x0
-call esi
-add esp,12
-push 0
-push 1
-push 0x0
-call esi
-add esp,12
+push 21
+mov ecx,5
+mov edx, dword [esp+0]
+cmp edx,ecx
+jge l0
 push edi
 push esi
 push edx
 push ecx
 push ebx
-call apply_oracle
+push 2
+call printh
+add esp,4
 pop ebx
 pop ecx
 pop edx
 pop esi
 pop edi
+jmp l1
+l0:
 push edi
 push esi
 push edx
 push ecx
 push ebx
-call diffuse
+push 3
+call printh
+add esp,4
 pop ebx
 pop ecx
 pop edx
 pop esi
 pop edi
-mov byte [ebx], 0xD
-pushad
-push dword [__q__]
-call qrun
-add esp, 4
-popad
+l1:
+push edi
+push esi
+push edx
+push ecx
+push ebx
+push s0
+call print
+add esp,4
+pop ebx
+pop ecx
+pop edx
+pop esi
+pop edi
+l2:
+add esp,4
 ret
 db 0xC0
 db 0xDE
 
 
 section .data:
+s0 db "okay!",0
 __q__ dd 0
 
 section .bss:

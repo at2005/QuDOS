@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 			for(int i = 0; i < st->get_child_trees().size(); i++) { 
 				compile(&(st->get_child_trees()[i]), func_symtab);	
 			}
-
+			
 			file << "db 0xC0\n";
 			file << "db 0xDE\n\n\n";	
 			func_symtab->var_counter = 0;

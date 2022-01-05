@@ -39,6 +39,7 @@
 // create global variables
 // jmp_flag is set during compilation of test condition
 static int jmp_flag = 0;
+static int cond_flag = 0;
 // label counter
 static int counter = 0;
 // variable counter
@@ -204,7 +205,12 @@ void push_x86(string val, string type) {
 string compile(SyntaxTree* st, symtab* symbol_table ) {
 	// get root of AST
 	Node* root = st->getRoot();
-	
+	if(root->getTValue() != "else" && cond_flag) {
+		cout << root->getTValue() << endl;
+		cond_flag = 0;
+		file << "l" + to_string(counter) << ":\n";
+		counter++;
+	}
 
 	// if operator
 	if(root->getTToken() == "OPERATOR") { 
@@ -469,10 +475,32 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		symbol_table->var_counter -= scope_table->table.size();
 				
 		delete scope_table;
+		file << "jmp " << "l" + to_string(counter) << endl;
 		file << lbl  << ":\n";
-		
+		cond_flag = 1;	
 		return "";	
 			
+	}
+
+	else if(root->getTValue() == "else") {
+		cond_flag = 0;
+		symtab* scope_table = new symtab;
+		scope_table->table = {};
+		scope_table->parent_table = symbol_table;
+		scope_table->var_counter = symbol_table->var_counter;
+
+		vector<SyntaxTree> child_trees = st->get_child_trees();
+
+		for(int i = 0; i < child_trees.size(); i++) {
+			SyntaxTree* child = &(child_trees[i]);
+			compile(child, scope_table);
+		
+		}
+
+		cond_flag = 1;
+		delete scope_table;
+		return "";
+	
 	}
 
 	else if(root->getTValue() == "asm") {
@@ -513,7 +541,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "Z") opcode = "0x3";
 		else if(root->getTValue() == "ID") opcode = "0x4";
 		else if(root->getTValue() == "CX") opcode = "0x5";
-	//	else if(root->getTValue() == "MEASURE") opcode = "0xF";
+		else if(root->getTValue() == "MEASURE") opcode = "0xF";
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
 		string opt = "0";
@@ -573,7 +601,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 				mov_x86("eax", obj_to_ret);
 
 			}
-
+			
+			file << "l" + to_string(counter++) << ":\n";
 			inc_esp_x86(symbol_table->var_counter*4);
 				
 			file << "ret\n";

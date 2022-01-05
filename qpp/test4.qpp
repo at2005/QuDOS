@@ -1,0 +1,41 @@
+link QGATE;
+link qrun;
+link sendq;
+link strcpy;
+
+
+function vqe() {
+	# calculate expectation value
+	int exp = 0;
+        # iterate 100 times
+	for(int i = 0, i < 100, i+=1) {
+		int theta = 0;
+		H(0);
+		CX(0,1);
+		RX(theta, 0);
+		
+                # measurement of the ZZ operator
+		int meas = 0;
+		CX(0,1);
+		MEASURE(1, meas);
+                # check if last qubit is 0
+		if(meas % 2 == 0) {
+			exp += 1;	
+		}	
+		
+		else {
+			exp -= 1;
+		}
+		
+	}
+
+	return;
+			
+
+}
+
+function main() {
+	nloc vqe();
+	qrun;
+	return;
+} 

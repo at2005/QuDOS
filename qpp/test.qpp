@@ -1,41 +1,44 @@
 
-link printf;
-link execq;
+link print;
+link qrun;
 link printh;
 link zero_buffer;
 link quant;
-link scanf;
+link input;
 link QGATE;
 link sendq;
-
-function newline() {
-	printf("\n");
-	return;	
-}
 
 
 
 function main() {
-	
-	
-string msg = "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde\nFor BTYSTE 2022\nThis is a multi-tasking kernel with paging enabled\nType INFO for more information\nType HELP for a basic user guide\n\n";
-	printf(msg);
-	char buff[256];
-	while(1==1) {
-		printf("A> ");
-		scanf(buff);
-		printf(buff);
-                newline();
-		zero_buffer(buff, 256);		
+        int a = 21;
+        if(a < 5) {
+            printh(2);    
+        }
 
-	}
+        else {
+            printh(3);    
+        }
+	
+	print("okay!");
+	
+#string msg = "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde\nFor BTYSTE 2022\nThis is a multi-tasking kernel with paging enabled\nType INFO for more information\nType HELP for a basic user guide\n\n";
+#	printf(msg);
+#	char buff[256];
+#	while(1==1) {
+#		print("A> ");
+#		input(buff);
+#		print(buff);
+#               newline();
+#		zero_buffer(buff, 256);		
+#
+#	}
+
 
 	return;
 
 
 }
-
-
 
 
 

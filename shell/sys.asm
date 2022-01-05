@@ -1,15 +1,16 @@
 
 [extern main]
 
-global printf
+global print
 global _start
 global printh
-global scanf
+global input
 global quant
 global zero_buffer
-global execq
+global qrun
 global sendq
 global strcpy
+global strcmp
 
 _start:
 	call quant
@@ -18,7 +19,7 @@ _start:
 	jmp $	
 
 
-printf:
+print:
 	mov ebx, dword [esp+4]
 	mov eax, 1
 	mov ecx, 0
@@ -37,7 +38,7 @@ printh:
 	ret
 
 
-scanf:
+input:
 	mov ebx, dword [esp+4]
 	mov eax, 3
 	mov ecx, 0
@@ -56,6 +57,55 @@ scanf:
 		
 	ret
 
+
+strcmp:
+	push edi
+	push esi
+	push edx
+	push ecx
+	push ebx
+	
+	mov ebx, [esp+24]
+	mov ecx, [esp+28]
+	mov edx, 0
+	mov esi, 2
+
+	iter_cmp:
+		mov dl, byte [ecx]
+		cmp dl, [ebx]
+		jne neq
+
+		cmp dl, 0
+		je eq
+		
+	;	pushad
+	;	push edx
+	;	call printh
+	;	pop edx
+	;	popad
+		
+		inc ecx
+		inc ebx	
+		mov edx,0
+		jmp iter_cmp
+			
+			
+		
+	neq:
+		mov eax, 0
+		jmp ex
+	eq:
+		mov eax,1
+		jmp ex		
+
+	ex:
+	pop ebx
+	pop ecx
+	pop edx
+	pop esi
+	pop edi
+	;add esp, 8
+	ret
 
 strcpy:
 	push edi
@@ -102,7 +152,7 @@ quant:
 	ret
 
 
-execq:
+qrun:
 
 	; send quantum data via DMA
 	mov ebx, [esp+4]
