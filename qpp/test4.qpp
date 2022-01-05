@@ -4,38 +4,55 @@ link sendq;
 link strcpy;
 
 
-function vqe() {
+int function vqe() {
+	asm("mov edi, 0xA0000000");
 	# calculate expectation value
-	int exp = 0;
-        # iterate 100 times
-	for(int i = 0, i < 100, i+=1) {
-		int theta = 0;
-		H(0);
-		CX(0,1);
-		RX(theta, 0);
-		
-                # measurement of the ZZ operator
-		int meas = 0;
-		CX(0,1);
-		MEASURE(1, meas);
-                # check if last qubit is 0
-		if(meas % 2 == 0) {
-			exp += 1;	
-		}	
-		
-		else {
-			exp -= 1;
+
+	int theta = 2;
+        int prev = 8192;	
+	for(int iter = 0, iter < 100, iter+=1) {
+		# iterate 100 times
+	        int exp = 0;
+		for(int i = 0, i < 1024, i+=1) {
+	                int meas = 0;
+			H(0);
+			CX(0,1);
+			RX(0, theta);
+			
+	                # measurement of the ZZ operator
+			CX(0,1);
+			MEASURE(0,addr(meas));
+			# check if last qubit is 0;
+			if((meas % 2) == 0) {
+				exp += 1;	
+			}	
+			
+			else {
+				exp -= 1;
+			}
+			
 		}
-		
+
+                if(exp < prev) {
+                    copy(prev, exp);
+		    theta += 1;
+
+                }
+
+                if(exp > prev) {
+                    theta -= 1;    
+                }
+
 	}
 
-	return;
+	return theta;
 			
 
 }
 
 function main() {
-	nloc vqe();
+    	nloc vqe();
 	qrun;
 	return;
+
 } 

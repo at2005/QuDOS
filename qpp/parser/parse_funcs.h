@@ -121,6 +121,7 @@ inline map<string, int> get_precedence_map() {
 	precedence_map.insert({ "|" , 10 });
 	precedence_map.insert({ "*" , 20 });
 	precedence_map.insert({ "/" , 20 });
+	precedence_map.insert({"%", 10});
 	
 
 	return precedence_map;

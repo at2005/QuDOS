@@ -13,6 +13,7 @@
 #define SUB_X86 "sub"
 #define MUL_X86 "imul"
 #define DIV_X86 "div"
+#define IDIV_X86 "idiv"
 
 #define JMP_X86 "jmp"
 #define JE_X86 "je"
@@ -205,6 +206,7 @@ void push_x86(string val, string type) {
 string compile(SyntaxTree* st, symtab* symbol_table ) {
 	// get root of AST
 	Node* root = st->getRoot();
+
 	if(root->getTValue() != "else" && cond_flag) {
 		cout << root->getTValue() << endl;
 		cond_flag = 0;
@@ -234,6 +236,16 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 
 		
+		if(root->getTValue() == "%") {
+			mov_x86(rreg, "0");
+			mov_x86(rreg, lreg);
+			file << "and " << rreg << ", 0x1\n";
+			//file << "xor " << rreg << ", 0x1\n";
+			free_reg(lreg);
+			return rreg;
+		
+		//	return "";
+		}		
 
 		// set operation type based on instruction
 		string op_type = "";
@@ -241,8 +253,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "-" || root->getTValue() == "-=") op_type = SUB_X86;
 		else if (root->getTValue() == "*" || root->getTValue() == "*=") op_type = MUL_X86;
 	
-		else if(root->getTValue() == "/") {
-			op_type = DIV_X86;
+		else if(root->getTValue() == "/" || root->getTValue() == "/=") {
+			op_type = IDIV_X86;
 			int eax_free = free_regs.eax;
 			int edx_free = free_regs.edx;
 			free_regs.edx = 1;
@@ -258,6 +270,14 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			file << "pop edx\n";
 			free_regs.eax = eax_free;
 			free_regs.edx = edx_free;
+
+			if(root->getTValue() == "/=") {
+				mov_x86(lreg, div_res);
+				free_reg(rreg);
+				return lreg;	
+			
+			}
+
 			free_reg(rreg);
 			free_reg(lreg);
 			return div_res;
@@ -444,7 +464,6 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		SyntaxTree right_tree = SyntaxTree(root->getRightChild());
 		string res = compile(&right_tree, symbol_table);
 		
-		
 		file << "push " << res << endl;
 		free_reg(res);
 		symbol_table->var_counter++;
@@ -513,10 +532,38 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			
 	}
 
+	else if(root->getTValue() == "addr") {
+		string param =  st->get_function_parameters()[0].getRoot()->getTValue();
+		string reg = get_free_reg();
+		int pos = search_symtab(symbol_table, param);
+		string offset =  to_string(4*(symbol_table->var_counter - (pos + 1)));	
+		mov_x86(reg, "esp");
+		file << "add " << reg << "," << offset << endl;	
+		//return  "(esp+"+offset+")";
+		return reg;
+
+	
+	}
+
+	else if(root->getTValue() == "copy") {
+		string param1 =  compile(&(st->get_function_parameters()[0]), symbol_table);
+		string param2 =  compile(&(st->get_function_parameters()[1]), symbol_table);
+		string reg = get_free_reg();
+		mov_x86(reg, param2);
+		mov_x86(param1, reg);
+		free_reg(param1);
+		free_reg(param2);
+		free_reg(reg);
+		return "";
+
+
+	}
+
 	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
 		int vc_copy = symbol_table->var_counter;
 		file << "push edi\npush esi\npush edx\npush ecx\npush ebx\n";
+		symbol_table->var_counter += 5;
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
 			symbol_table->var_counter++;
@@ -541,6 +588,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "Z") opcode = "0x3";
 		else if(root->getTValue() == "ID") opcode = "0x4";
 		else if(root->getTValue() == "CX") opcode = "0x5";
+		else if(root->getTValue() == "RX") opcode = "0x6";
 		else if(root->getTValue() == "MEASURE") opcode = "0xF";
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
@@ -629,7 +677,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		string break_label = compile(&(func_params[1]), loop_scope);
 		
 		vector<SyntaxTree> child_trees = st->get_child_trees();
-
+		
 		for(int i = 0; i < child_trees.size(); i++) {
 			compile(&(child_trees[i]),loop_scope);
 		
@@ -637,10 +685,11 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 		compile(&(func_params[2]), loop_scope);
 			
+		inc_esp_x86((loop_scope->table.size()-1) * 4);
 		file << "jmp " << jmp_label << endl;
 			
 		file << break_label << ":\n";	
-		inc_esp_x86(loop_scope->table.size() * 4);
+		inc_esp_x86(4);
 		delete loop_scope;
 		return break_label;		
 	

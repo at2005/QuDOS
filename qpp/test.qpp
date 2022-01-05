@@ -11,16 +11,23 @@ link sendq;
 
 
 function main() {
-        int a = 21;
-        if(a < 5) {
-            printh(2);    
-        }
 
-        else {
-            printh(3);    
-        }
+	int var1 = 2;
+	int var2 = 4;
+	copy(var1, var2);
+	printh(var1);
+
+#	for(int j = 0, j < 2, j+=1) {
+#		int a = 12;
+#		for(int i = 0, i < 10, i+=1) {
+#			int b = 5;
+#			if(1 == 1) {
+#				copy(a,2);
+#			}
+#
+#		}	
+#	}
 	
-	print("okay!");
 	
 #string msg = "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde\nFor BTYSTE 2022\nThis is a multi-tasking kernel with paging enabled\nType INFO for more information\nType HELP for a basic user guide\n\n";
 #	printf(msg);
