@@ -21,9 +21,11 @@ int main(int argc, char** argv) {
 	
 		
 	gate_reg = "esi";
-
+	free_regs.edi = 1;
 	free_regs.esi = 1;
-	
+	free_regs.eax = 1;
+	free_regs.ebx = 1;	
+
 	SyntaxTree* main_tree;
 	for(int i = 0; i < expressions.size(); i++) {
 		SyntaxTree* st = new SyntaxTree(expressions[i]);

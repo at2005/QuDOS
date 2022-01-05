@@ -1,0 +1,27 @@
+link QGATE;
+link qrun;
+link sendq;
+link strcpy;
+
+
+
+int function do() {
+	asm("mov edi, 0xA0000000");
+	H(1);
+	return 4;
+
+}
+
+function main() {
+	for(int i = 0, i < 500, i+=1) {
+
+	}
+
+	H(0);
+	CX(0,1);
+	nloc do();
+	MEASURE(1);
+	qrun;
+	return;
+
+}

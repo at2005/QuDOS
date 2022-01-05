@@ -488,6 +488,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
 		int vc_copy = symbol_table->var_counter;
+		file << "push edi\npush esi\npush edx\npush ecx\npush ebx\n";
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
 			symbol_table->var_counter++;
@@ -496,9 +497,10 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 
 		symbol_table->var_counter = vc_copy;
-
+		cout << func_params.size() << " : " << root->getTValue() << endl;
 		file << "call " << root->getTValue() << endl;
 		inc_esp_x86(func_params.size() * 4);
+		file << "pop ebx\npop ecx\npop edx\npop esi\npop edi\n";
 		return "eax";
 	
 	}
@@ -511,6 +513,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		else if(root->getTValue() == "Z") opcode = "0x3";
 		else if(root->getTValue() == "ID") opcode = "0x4";
 		else if(root->getTValue() == "CX") opcode = "0x5";
+	//	else if(root->getTValue() == "MEASURE") opcode = "0xF";
 		vector<SyntaxTree> func_params = st->get_function_parameters();
 		string param = compile(&(func_params[0]), symbol_table);
 		string opt = "0";
@@ -530,7 +533,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	}
 
 	else if(root->getTToken() == "KEYWORD") {
-		if(root->getTValue() == "execq") file << "mov byte [ebx], 0xD\npushad\npush dword [__q__]\ncall execq\nadd esp, 4\npopad\n";
+		if(root->getTValue() == "qrun") file << "mov byte [ebx], 0xD\npushad\npush dword [__q__]\ncall qrun\nadd esp, 4\npopad\n";
 		else if (root->getTValue() == "link") {
 			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
 			file << "[extern " << func_name << "]\n";
@@ -588,13 +591,13 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		loop_scope->parent_table = symbol_table;	
 		loop_scope->var_counter = symbol_table->var_counter;
 		vector<SyntaxTree> func_params = st->get_function_parameters();
-		compile(&(func_params[0]), symbol_table);
+		compile(&(func_params[0]), loop_scope);
 		string jmp_label =  "l" + to_string(counter);
 		file << jmp_label << ":\n";
 	       	counter++;
 		
 		jmp_flag = 1;
-		string break_label = compile(&(func_params[1]), symbol_table);
+		string break_label = compile(&(func_params[1]), loop_scope);
 		
 		vector<SyntaxTree> child_trees = st->get_child_trees();
 
@@ -603,11 +606,12 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		
 		}
 
-		compile(&(func_params[2]), symbol_table);
+		compile(&(func_params[2]), loop_scope);
 			
 		file << "jmp " << jmp_label << endl;
-		
+			
 		file << break_label << ":\n";	
+		inc_esp_x86(loop_scope->table.size() * 4);
 		delete loop_scope;
 		return break_label;		
 	

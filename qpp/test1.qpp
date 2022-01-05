@@ -1,0 +1,29 @@
+link QGATE;
+link print;
+link printh;
+link input;
+link strcmp;
+
+function say_hi_back() {
+	print("hello to you to!\n");
+	return;
+
+}
+
+function main() {
+	char buff[256];
+	input(buff,256);
+	if(strcmp(buff, "hello") == 1) {
+		for(int i = 0, i < 10, i+= 1) {
+			say_hi_back();
+		}
+		
+		return;
+	
+	}	
+
+	print("Bye!\n");
+
+	return;
+
+}

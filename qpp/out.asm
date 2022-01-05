@@ -1,17 +1,84 @@
 section .text:
 global main
-[extern printf]
-[extern execq]
-[extern printh]
-[extern zero_buffer]
-[extern quant]
-[extern scanf]
 [extern QGATE]
-[extern sendq]
-newline:
-push s0
-call printf
-add esp,4
+[extern qrun]
+apply_oracle:
+push 0
+push 1
+push 0x0
+call esi
+add esp,12
+push 1
+push 0
+push 0x5
+call esi
+add esp,12
+push 0
+push 1
+push 0x0
+call esi
+add esp,12
+ret
+db 0xC0
+db 0xDE
+
+
+diffuse:
+push 0
+push 0
+push 0x0
+call esi
+add esp,12
+push 0
+push 1
+push 0x0
+call esi
+add esp,12
+push 0
+push 0
+push 0x1
+call esi
+add esp,12
+push 0
+push 1
+push 0x1
+call esi
+add esp,12
+push 0
+push 1
+push 0x0
+call esi
+add esp,12
+push 1
+push 0
+push 0x5
+call esi
+add esp,12
+push 0
+push 1
+push 0x0
+call esi
+add esp,12
+push 0
+push 1
+push 0x1
+call esi
+add esp,12
+push 0
+push 0
+push 0x1
+call esi
+add esp,12
+push 0
+push 1
+push 0x0
+call esi
+add esp,12
+push 0
+push 0
+push 0x0
+call esi
+add esp,12
 ret
 db 0xC0
 db 0xDE
@@ -20,42 +87,50 @@ db 0xDE
 main:
 mov dword [__q__],ebx
 mov esi, QGATE
-push s1
-push  dword [esp+0]
-call printf
-add esp,4
-push num
-l0:
-mov eax,1
-cmp eax,1
-jne l1
-push s2
-call printf
-add esp,4
-push  dword [esp+0]
-call scanf
-add esp,4
-push  dword [esp+0]
-call printf
-add esp,4
-call newline
-push 256
-push  dword [esp+4]
-call zero_buffer
-add esp,8
-jmp l0
-l1:
-add esp,8
+push 0
+push 0
+push 0x0
+call esi
+add esp,12
+push 0
+push 1
+push 0x0
+call esi
+add esp,12
+push edi
+push esi
+push edx
+push ecx
+push ebx
+call apply_oracle
+pop ebx
+pop ecx
+pop edx
+pop esi
+pop edi
+push edi
+push esi
+push edx
+push ecx
+push ebx
+call diffuse
+pop ebx
+pop ecx
+pop edx
+pop esi
+pop edi
+mov byte [ebx], 0xD
+pushad
+push dword [__q__]
+call qrun
+add esp, 4
+popad
 ret
 db 0xC0
 db 0xDE
 
 
 section .data:
-s0 db "",0xA,"",0
-s1 db "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde",0xA,"For BTYSTE 2022",0xA,"This is a multi-tasking kernel with paging enabled",0xA,"Type INFO for more information",0xA,"Type HELP for a basic user guide",0xA,"",0xA,"",0
-s2 db "A> ",0
 __q__ dd 0
 
 section .bss:
-num resb 256

@@ -1,7 +1,7 @@
 
 link quant;
 link sendq;
-link execq;
+link qrun;
 link QGATE;
 link printh;
 link printf;
@@ -34,7 +34,7 @@ function main() {
 	H(0);
 	nloc stuff();
 #	nloc do_stuff();
-	execq;
+	qrun;
 	return;
 
 }

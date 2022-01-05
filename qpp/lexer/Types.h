@@ -20,7 +20,7 @@ struct
 	unordered_map<string, int> keyword = {
 		{"measure", 1},
 		{"return", 1},
-		{"execq",1},
+		{"qrun",1},
 		{"link", 1},
 		{"nloc", 1},
 		{"async", 1}
