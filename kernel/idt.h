@@ -431,6 +431,10 @@ uint32_t qcall_handler(sys_args qparams) {
 
 		case 2:
 			run_quantum();
+			print_hex(current_proc->qproc->async_func);
+			print_hex(mmio_read32(0xFEA00000,0x20)); 
+			return current_proc->qproc->async_func;
+
 			break;
 	
 
@@ -517,7 +521,11 @@ uint32_t qcall_handler(sys_args qparams) {
 			qc_dma_write(buff_cdata, 512);
 			break;
 			
-
+	
+		case 6:;
+		       
+		       current_proc->qproc->async_func = qparams.ecx; 
+		       break;
 	
 	}
 
@@ -747,7 +755,7 @@ void irq13_handler() {
 }
 
 void irq14_handler() {
-	//print("IRQ14");
+//	print("IRQ14");
 	outb(0x20, PICS_CONTROL);
 	outb(0x20, PICM_CONTROL);
 

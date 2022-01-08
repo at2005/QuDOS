@@ -1,6 +1,8 @@
 
 link QGATE;
 link qrun;
+link asyncq;
+link input;
 
 
 function apply_oracle() {
@@ -27,13 +29,20 @@ function diffuse() {
 
 }
 
+int function all() {
+	char buff[256];
+	input(buff);
+	return;	
+
+}
+
 
 function main() {
 	H(0);
 	H(1);
 	apply_oracle();
 	diffuse();
-	MEASURE(1);
+	async all(); 
 	qrun;
 	return;
 

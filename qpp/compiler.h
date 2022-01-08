@@ -562,8 +562,10 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 	else if(root->getTToken() == "FCALL" && !isAssembly(root->getTValue())) {
 		vector<SyntaxTree> func_params = st->get_function_parameters();	
 		int vc_copy = symbol_table->var_counter;
-		file << "push edi\npush esi\npush edx\npush ecx\npush ebx\n";
-		symbol_table->var_counter += 5;
+//		file << "push edi\npush esi\npush edx\npush ecx\npush ebx\n";
+		file << "push edi\npush esi\npush edx\npush ecx\n";
+	//	symbol_table->var_counter += 5;
+		symbol_table->var_counter += 4;
 		for(int i = func_params.size()-1; i > -1; i--) {
 			string param = compile(&(func_params[i]), symbol_table);
 			symbol_table->var_counter++;
@@ -575,7 +577,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		cout << func_params.size() << " : " << root->getTValue() << endl;
 		file << "call " << root->getTValue() << endl;
 		inc_esp_x86(func_params.size() * 4);
-		file << "pop ebx\npop ecx\npop edx\npop esi\npop edi\n";
+	//	file << "pop ebx\npop ecx\npop edx\npop esi\npop edi\n";
+		file << "pop ecx\npop edx\npop esi\npop edi\n";
 		return "eax";
 	
 	}
@@ -642,6 +645,13 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 		}
 
+		else if(root->getTValue() == "async") {	
+			string func_name = st->get_function_parameters()[0].getRoot()->getTValue();
+			file << "pushad\npush " << func_name << endl << "call asyncq\nadd esp,4\npopad\n";
+			
+
+		}
+
 		else if(root->getTValue() == "return") {
 			if(st->get_function_parameters().size() != 0) {
 				SyntaxTree param = st->get_function_parameters()[0];
@@ -656,6 +666,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			file << "ret\n";
 
 		}
+	
 	
 	}
 

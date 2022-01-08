@@ -11,6 +11,8 @@ global qrun
 global sendq
 global strcpy
 global strcmp
+global asyncq
+
 
 _start:
 	call quant
@@ -178,6 +180,10 @@ qrun:
 	ret
 
 
+poll_fin_irq:
+	mov eax, 1
+	ret
+
 
 poll:
 	mov eax, 3
@@ -189,6 +195,7 @@ poll:
 	jne poll
 	ret
 
+
 	
 run:
 
@@ -197,6 +204,19 @@ run:
 	mov ecx, 0
 	mov edx,0
 	int 0x40
+	
+	cmp eax, 0
+	je no_async
+	call eax
+			
+	no_async:
+	pushad
+	push 0xDEADC0DE
+	call printh
+	add esp,4
+	popad
+
+	call poll_fin_irq	
 	ret
 
 
@@ -208,6 +228,15 @@ sendq:
 	mov edx, 0
 	int 0x40
 	
+	ret
+
+
+asyncq:
+	mov eax, 6
+	mov ecx, [esp+4]
+	mov ebx,0
+	mov edx, 0
+	int 0x40
 	ret
 
 

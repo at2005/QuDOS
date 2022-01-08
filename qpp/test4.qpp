@@ -2,7 +2,8 @@ link QGATE;
 link qrun;
 link sendq;
 link strcpy;
-
+link asyncq;
+link input;
 
 int function vqe() {
 	asm("mov edi, 0xA0000000");
@@ -45,13 +46,22 @@ int function vqe() {
 
 	}
 
-	return theta;
+	return prev;
 			
+
+}
+
+
+function all() {
+	char buff[256];
+	input(buff);
+	return;
 
 }
 
 function main() {
     	nloc vqe();
+#	async all();
 	qrun;
 	return;
 

@@ -41,6 +41,8 @@ typedef struct qproc_struct {
 	klist* cfunc_list;
 	// classical data corresponding to quantum instructions
 	uint8_t* qdata;
+	// async func
+	uint32_t async_func;
 	// current state
 	QSTATE state;
 		
@@ -66,6 +68,7 @@ qproc_struct* create_qproc() {
 	// init state
 	new_qproc->state = DORMANT;
 	new_qproc->cfunc_list = create_klist();
+	new_qproc->async_func = 0;
 	// add to doubly linked list
 	add_klist(qlist, (uint32_t)new_qproc);
 	// return process

@@ -2,19 +2,46 @@ link QGATE;
 link qrun;
 link sendq;
 link strcpy;
+link asyncq;
 
 int function process() {
 	asm("mov edi, 0xA0000000");
-	if(1 == 1) {
-		H(0);	
+        for(int i = 0, i < 100000, i+=1) {
+            H(0);
+            CX(0,1);
+            X(0);
+            RX(31,0);
+        }	
+	int a = 0;
+        H(0);
+        H(1);
+	MEASURE(0,addr(a));
+	if(a >= 3) {
+		return 10;
 	}
 
-	return 3;
+	else {
+		return 20;
+	}
+
 }
 
+
+link input;
+function all() {
+	asm("pushad");
+	print("hello there\n");
+	asm("popad");
+	char buff[256];
+	input(buff);
+	return;
+
+}
+
+link print;
 function main() {
-	H(0);
 	nloc process();
+	async all();
 	qrun;
 	return;
 
