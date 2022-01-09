@@ -45,7 +45,8 @@ int function vqe() {
                 }
 
 	}
-
+	
+	prev /= 1024;
 	return prev;
 			
 
@@ -61,7 +62,7 @@ function all() {
 
 function main() {
     	nloc vqe();
-#	async all();
+	async all();
 	qrun;
 	return;
 

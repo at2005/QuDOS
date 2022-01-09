@@ -223,7 +223,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		// compile children
 		is_left = true;
 		string lreg = compile(&left_tree, symbol_table);
-		is_left = true;
+//		is_left = true;
 		string rreg = compile(&right_tree, symbol_table);
 
 		
@@ -261,6 +261,11 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			free_regs.eax = 1;	
 			file << "push edx\n";
 			file << "push eax\n";
+			// inc var counter since we've pushed two regs to stack
+			symbol_table->var_counter += 2;	
+			is_left = true;
+			string lreg = compile(&left_tree, symbol_table);
+			string rreg = compile(&right_tree, symbol_table);
 			mov_x86("edx", "0");
 			mov_x86("eax", lreg);
 			file << op_type << " " << rreg << endl;
@@ -268,6 +273,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			mov_x86(div_res, "eax");
 			file << "pop eax\n";
 			file << "pop edx\n";
+			symbol_table->var_counter -= 2;
 			free_regs.eax = eax_free;
 			free_regs.edx = edx_free;
 
@@ -284,9 +290,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		}
 
 		file << op_type << " " << lreg << "," << rreg << endl;
-		
 		free_reg(rreg);
-
+		
 		return lreg;
 	}
 
@@ -486,7 +491,8 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 
 		for(int i = 0; i < child_trees.size(); i++) {
 			SyntaxTree* child = &(child_trees[i]);
-			compile(child, scope_table);
+			string stuff = compile(child, scope_table);
+			free_reg(stuff);
 		
 		}
 
@@ -597,13 +603,15 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		string param = compile(&(func_params[0]), symbol_table);
 		string opt = "0";
 		if(func_params.size() == 2) opt = compile(&(func_params[1]), symbol_table);
-
+		
 		//file << "push ebx\npush ecx\npush edx\npush esi\npush edi\n";	
 		//file << "push " << quant_reg << endl;
 		file << "push " << opt << endl;
 		file << "push " << param << endl; 
 		file << "push " << opcode << endl;
 		file << "call " << gate_reg << endl;
+		free_reg(param);
+		free_reg(opt);
 		inc_esp_x86(12);
 		//file << "pop edi\npop esi\npop edx\npop ecx\npop ebx\n";	
 
