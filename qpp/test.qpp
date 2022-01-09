@@ -14,7 +14,10 @@ function main() {
 
 	int a = 5000;
 	int b = 1024;
-	printh(a/b);	
+	for(int i = 0, i < 100, i += 1) {
+		printh(a/b);	
+	
+	}
 
 	
 #string msg = "Command Shell For Hybrid Classical/Quantum OS Programmed By Ayush Tambde\nFor BTYSTE 2022\nThis is a multi-tasking kernel with paging enabled\nType INFO for more information\nType HELP for a basic user guide\n\n";

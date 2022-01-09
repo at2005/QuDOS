@@ -98,14 +98,15 @@ add esp,4
 mov ecx,1024
 push edx
 push eax
-mov NONE_FREE,1024
+mov ecx,1024
 mov edx,0
 mov eax, dword [esp+8]
-idiv NONE_FREE
-mov NONE_FREE,eax
+cdq
+idiv ecx
+mov ecx,eax
 pop eax
 pop edx
-mov  dword [esp+8],NONE_FREE
+mov  dword [esp+0],ecx
 mov eax, dword [esp+0]
 l10:
 add esp,8

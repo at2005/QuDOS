@@ -223,7 +223,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		// compile children
 		is_left = true;
 		string lreg = compile(&left_tree, symbol_table);
-//		is_left = true;
+		is_left = true;
 		string rreg = compile(&right_tree, symbol_table);
 
 		
@@ -264,11 +264,16 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			// inc var counter since we've pushed two regs to stack
 			symbol_table->var_counter += 2;	
 			is_left = true;
+			free_reg(lreg);
+			free_reg(rreg);
 			string lreg = compile(&left_tree, symbol_table);
 			string rreg = compile(&right_tree, symbol_table);
 			mov_x86("edx", "0");
 			mov_x86("eax", lreg);
+			file << "cdq\n";
 			file << op_type << " " << rreg << endl;
+			free_reg(lreg);
+			free_reg(rreg);
 			string div_res = get_free_reg();
 			mov_x86(div_res, "eax");
 			file << "pop eax\n";
@@ -278,6 +283,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 			free_regs.edx = edx_free;
 
 			if(root->getTValue() == "/=") {
+				string lreg = compile(&left_tree, symbol_table);
 				mov_x86(lreg, div_res);
 				free_reg(rreg);
 				return lreg;	
@@ -492,7 +498,7 @@ string compile(SyntaxTree* st, symtab* symbol_table ) {
 		for(int i = 0; i < child_trees.size(); i++) {
 			SyntaxTree* child = &(child_trees[i]);
 			string stuff = compile(child, scope_table);
-			free_reg(stuff);
+			//free_reg(stuff);
 		
 		}
 

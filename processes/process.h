@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include "../qc/qproc.h"
 
+static int pid_counter = 0;
 
 //void* kmalloc(size_t bytes_req);
 
@@ -150,10 +151,27 @@ process_struct* create_proc(uint32_t* proc_ip, pframe_entry* pf_ls) {
 	new_proc->eip = (uint32_t)proc_ip;
 	// set start address
 	new_proc->program_start = (uint32_t)proc_ip;
+	new_proc->pid = ++pid_counter;
 	// add process to process table
 	add_proc(new_proc);
 	return new_proc;
 }
+
+
+// search for process table entry by PID
+process_struct* search_pid(uint32_t pid) {
+	process_struct* el = proc_head->next_proc;
+	while(el != proc_head) {
+		if(el->pid == pid) {
+			return el;
+		}
+
+		el = el->next_proc;
+	}
+
+	return NULL;
+}
+
 
 // create page frame list to hold processes' page frames 
 pframe_entry* create_pfls() {

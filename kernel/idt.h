@@ -19,7 +19,7 @@
 #define LISTEN_CMD_PIC 0x11
 
 static char* buff_flush_addr = 0x0;
-
+static int qc_computing = 0;
 static int dma_flag = 0;
 // entry for each IRQ in interrupt descriptor table
 struct idt_entry {
@@ -412,10 +412,12 @@ void write_metadata(klist* ftable_array, func_table* cbuff) {
 }
 
 
+
+
 uint32_t qcall_handler(sys_args qparams) {
 	switch(qparams.eax) {
 		case 0:
-			current_proc->qproc = create_qproc();
+			current_proc->qproc = create_qproc(current_proc->pid);
 			return (uint32_t)(current_proc->qproc->qdata);
 			break;
 
@@ -430,8 +432,10 @@ uint32_t qcall_handler(sys_args qparams) {
 			break;
 
 		case 2:
+			qc_computing = 1;
+			mmio_write32(mmio_read32(0xFEA00000, 0x20) | 0x80, 0xFEA00000, 0x20);
 			run_quantum();
-			print_hex(current_proc->qproc->async_func);
+		//	print_hex(current_proc->qproc->async_func);
 			print_hex(mmio_read32(0xFEA00000,0x20)); 
 			return current_proc->qproc->async_func;
 
@@ -730,7 +734,13 @@ void irq10_handler() {
 
 
 void irq11_handler() {
-	
+	if(qc_computing) {
+		print("done computing!");
+		//p`rint_hex(mmio_read32(0xFEA00000, 0x08));
+		
+		
+
+	}
 	//write_32_addr(0x64, read_32_addr(0x24));
 	mmio_write32(mmio_read32(0xFEA00000, 0x24), 0xFEA00000, 0x64);
 	dma_flag = 1;
