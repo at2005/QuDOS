@@ -261,7 +261,15 @@ void print_bitstr(uint32_t hex) {
 }
 
 
+void print_signed_hex(int hex) {
+	int sign = hex & 0x80000000;
+	hex -= 1;
+	if(sign) print("-");
+	print_hex(~hex);
 
+
+
+}
 
 // get cursor offset
 unsigned short get_cursor() {

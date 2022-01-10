@@ -58,4 +58,21 @@ int get_timer() {
 }
 
 
+void schedule_quantum() {
+	process_struct* temp = current_proc;
+	klist* el = qlist->next;
+	while(el != qlist) {
+		qproc_struct* qproc = (qproc_struct*)(el->ptr);
+		if(qproc->state == BLOCKED) {
+			current_proc = search_pid(qproc->cpid);
+			current_proc = temp;
+						
+		}
+
+		el = qlist->next;
+	}
+
+
+
+}
 #endif

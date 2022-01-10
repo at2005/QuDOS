@@ -423,10 +423,8 @@ uint32_t qcall_handler(sys_args qparams) {
 
 
 		case 1:;
+		       	qc_mutex_lock();
 		       	uint8_t* buff_qdata = (uint8_t*)(qparams.ebx);
-
-			//for(int i = 0; i < 28; i++) print_hex(buff_cdata[i]);
-
 			qc_dma_woffset(buff_qdata,1024, qparams.ecx);
 		
 			break;
@@ -436,7 +434,6 @@ uint32_t qcall_handler(sys_args qparams) {
 			mmio_write32(mmio_read32(0xFEA00000, 0x20) | 0x80, 0xFEA00000, 0x20);
 			run_quantum();
 		//	print_hex(current_proc->qproc->async_func);
-			print_hex(mmio_read32(0xFEA00000,0x20)); 
 			return current_proc->qproc->async_func;
 
 			break;
@@ -472,7 +469,6 @@ uint32_t qcall_handler(sys_args qparams) {
 			func_header* fhead = (func_header*)(current_proc->qproc->cdata);
 			
 			fhead->num_func++;
-		//	print_hex(fhead->num_func);
 			func_table* new_entry = (func_table*)kmalloc(sizeof(func_table));
 			strcpy(func_name, new_entry->fname);
 			new_entry->addr = (uint32_t)func_start;
@@ -514,13 +510,10 @@ uint32_t qcall_handler(sys_args qparams) {
 			fh->id[3] = 'I';
 			fh->id[4] = '\0';
 			
-			//fh->num_func = 1;
 			fh->offset = current_proc->qproc->coffset;
 
 			write_metadata(current_proc->qproc->cfunc_list, (func_table*)((uint32_t)buff_cdata + current_proc->qproc->coffset));
 			
-	//		func_table* t1 = (func_table*)((uint32_t)buff_cdata + current_proc->qproc->coffset);
-	//		print(t1[1].fname);
 
 			qc_dma_write(buff_cdata, 512);
 			break;
@@ -735,7 +728,12 @@ void irq10_handler() {
 
 void irq11_handler() {
 	if(qc_computing) {
-		print("done computing!");
+		int b = mmio_read32(0xFEA00000, 0x08);
+		if(b & 0x80000000) print_signed_hex(b);
+		else print_hex(b);
+		qc_mutex_unlock();
+
+	//	print("done computing!");
 		//p`rint_hex(mmio_read32(0xFEA00000, 0x08));
 		
 		

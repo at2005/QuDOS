@@ -94,7 +94,6 @@ void main() {
 	//uint32_t* stack_bottom2 = get_page();
 	//map_identity(stack_bottom2);
 	
-	
 	map_identity(0xFEA00000);
 	map_identity(0xFEA40000);
 	

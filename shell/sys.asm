@@ -210,11 +210,6 @@ run:
 	call eax
 			
 	no_async:
-	pushad
-	push 0xDEADC0DE
-	call printh
-	add esp,4
-	popad
 
 	call poll_fin_irq	
 	ret

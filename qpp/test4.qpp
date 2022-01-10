@@ -4,6 +4,7 @@ link sendq;
 link strcpy;
 link asyncq;
 link input;
+link print;
 
 int function vqe() {
 	asm("mov edi, 0xA0000000");
@@ -53,7 +54,7 @@ int function vqe() {
 }
 
 
-function all() {
+function do_while_running() {
 	char buff[256];
 	input(buff);
 	return;
@@ -62,8 +63,9 @@ function all() {
 
 function main() {
     	nloc vqe();
-	async all();
+	async do_while_running();
 	qrun;
+	print("Finished async operation!\n");
 	return;
 
 } 

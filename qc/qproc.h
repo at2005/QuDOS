@@ -4,9 +4,24 @@
 
 #include "../memory/dlist.h"
 
+
 typedef enum QSTATE {ACTIVE, BLOCKED} QSTATE;
 
 uint32_t fetch_vpage();
+
+int qc_mutex = 0;
+
+void qc_mutex_lock() {
+	qc_mutex = 1;
+
+}
+
+
+void qc_mutex_unlock() {
+	qc_mutex = 0;
+}
+
+
 
 static klist* qlist;
 
@@ -78,21 +93,6 @@ qproc_struct* create_qproc(uint32_t cpid) {
 }
 
 
-void schedule_quantum() {
-	klist* el = qlist->next;
-	while(el != qlist) {
-		qproc_struct* qproc = (qproc_struct*)(el->ptr);
-		if(qproc->state == BLOCKED) {
-			qproc->cpid;
-						
-		}
-
-		el = qlist->next;
-	}
-
-
-
-}
 
 
 #endif

@@ -6,6 +6,7 @@ global main
 [extern strcpy]
 [extern asyncq]
 [extern input]
+[extern print]
 vqe:
 mov edi, 0xA0000000
 push 2
@@ -115,7 +116,7 @@ db 0xC0
 db 0xDE
 
 
-all:
+do_while_running:
 push num
 push edi
 push esi
@@ -152,7 +153,7 @@ call strcpy
 mov ebx,eax
 add esp,8
 pushad
-push all
+push do_while_running
 call asyncq
 add esp,4
 popad
@@ -162,6 +163,17 @@ push dword [__q__]
 call qrun
 add esp, 4
 popad
+push edi
+push esi
+push edx
+push ecx
+push s0
+call print
+add esp,4
+pop ecx
+pop edx
+pop esi
+pop edi
 l12:
 ret
 db 0xC0
@@ -170,6 +182,7 @@ db 0xDE
 
 section .data:
 msg_vqe db "vqe",0
+s0 db "Finished async operation!",0xA,"",0
 __q__ dd 0
 
 section .bss:
